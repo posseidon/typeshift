@@ -1,0 +1,58 @@
+.codegraph
+.opencode
+
+### Java ###
+*.class
+*.jar
+*.war
+.apt_generated
+bin/
+
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+!maven-wrapper.properties
+
+### Spring Boot ###
+*.pid
+*.seed
+*.log
+logs/
+
+### Application data ###
+*.db
+*.sqlite
+typeshift.db
+
+### IDEs ###
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+.vscode/
+.history/
+
+# Other editors / OS
+*.swp
+*~
+.DS_Store
+Thumbs.db

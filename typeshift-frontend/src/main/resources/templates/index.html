@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>TypeShift — Shift Dashboard</title>
+</head>
+<body>
+  <section th:fragment="content">
+    <h1>Shift Review</h1>
+    <p>Orders processed, ledger accuracy, and patience meter evaluations appear here.</p>
+    <p>
+      <a th:href="@{/login}">Start your shift</a>
+      —
+      <a th:href="@{/signup}">Open an employment record</a>
+    </p>
+  </section>
+</body>
+</html>

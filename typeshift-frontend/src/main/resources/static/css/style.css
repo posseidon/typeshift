@@ -1,0 +1,35 @@
+/* TypeShift base styling — vanilla CSS, UTF-8 text with diacritics. */
+:root {
+  font-family: "Segoe UI", "Noto Sans", system-ui, sans-serif;
+  color: #1f2a24;
+}
+
+body {
+  margin: 0;
+  padding: 2rem;
+}
+
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #d8ddd9;
+  padding-bottom: 0.75rem;
+}
+
+.brand {
+  font-weight: 700;
+  text-decoration: none;
+  color: inherit;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 22rem;
+}
+
+.error {
+  color: #a4262c;
+}

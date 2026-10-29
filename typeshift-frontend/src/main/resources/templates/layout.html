@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} ?: 'TypeShift'">TypeShift</title>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"></script>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <script th:src="@{/js/engine.js}" defer></script>
+</head>
+<body>
+  <header class="topnav">
+    <a class="brand" th:href="@{/}">TypeShift</a>
+  </header>
+  <!-- Content injection point: page controllers point the content fragment here. -->
+  <main id="content" th:replace="~{${contentFragment} :: content}"></main>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>TypeShift — Start of Shift</title>
+</head>
+<body>
+  <section th:fragment="content">
+    <h1>Start your shift</h1>
+    <p th:if="${error}" class="error" role="alert">Wrong username or password.</p>
+    <form th:action="@{/login}" method="post">
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Clock in</button>
+    </form>
+    <p><a th:href="@{/signup}">No employment record yet? Open one.</a></p>
+  </section>
+</body>
+</html>
