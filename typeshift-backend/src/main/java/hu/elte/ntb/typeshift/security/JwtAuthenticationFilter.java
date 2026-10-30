@@ -1,7 +1,5 @@
 package hu.elte.ntb.typeshift.security;
 
-import hu.elte.ntb.typeshift.service.JwtTokenService;
-import hu.elte.ntb.typeshift.service.RevocationService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

@@ -1,8 +1,8 @@
 package hu.elte.ntb.typeshift.config;
 
 import hu.elte.ntb.typeshift.security.JwtAuthenticationFilter;
-import hu.elte.ntb.typeshift.service.JwtTokenService;
-import hu.elte.ntb.typeshift.service.RevocationService;
+import hu.elte.ntb.typeshift.security.JwtTokenService;
+import hu.elte.ntb.typeshift.security.RevocationService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

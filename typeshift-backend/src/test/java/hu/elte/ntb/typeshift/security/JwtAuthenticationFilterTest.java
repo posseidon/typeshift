@@ -6,10 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import hu.elte.ntb.typeshift.model.UserAccount;
-import hu.elte.ntb.typeshift.repository.UserAccountRepository;
-import hu.elte.ntb.typeshift.service.JwtTokenService;
-import hu.elte.ntb.typeshift.service.RevocationService;
+import hu.elte.ntb.typeshift.account.model.UserAccount;
+import hu.elte.ntb.typeshift.account.repository.UserAccountRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import java.time.Duration;
