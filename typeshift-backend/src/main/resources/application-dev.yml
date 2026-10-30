@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://127.0.0.1:5432/typeshift
     username: ${POSTGRES_USER:typeshift}
-    password: ${POSTGRES_PASSWORD:typeshift}
+    password: ${POSTGRES_PASSWORD:password!}
 typeshift:
   ai:
     ollama-base-url: ${OLLAMA_BASE_URL:http://localhost:11434}

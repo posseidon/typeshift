@@ -5,18 +5,34 @@
 </head>
 <body>
   <section th:fragment="content">
-    <h1>Open an employment record</h1>
-    <p th:if="${error}" class="error" role="alert" th:text="${error}"></p>
-    <form th:action="@{/signup}" method="post">
-      <label for="username">Username</label>
-      <input id="username" name="username" type="text" autocomplete="username" required>
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="new-password" required>
-      <label for="displayName">Display name (optional)</label>
-      <input id="displayName" name="displayName" type="text" autocomplete="nickname">
-      <button type="submit">Create record</button>
-    </form>
-    <p><a th:href="@{/login}">Already have a record? Start your shift.</a></p>
+    <div class="auth-wrap">
+      <div class="docket auth-card">
+        <div class="punch-strip"></div>
+        <div class="inner">
+          <h1 class="headline-xl">New Employment Record</h1>
+          <p class="auth-sub label-caps">Personnel Registry • Application Form TS-1</p>
+          <p th:if="${error}" class="error label-caps" role="alert" th:text="${error}">Error</p>
+          <form class="stack" th:action="@{/signup}" method="post">
+            <div class="field">
+              <label for="username">Username</label>
+              <input id="username" name="username" type="text" autocomplete="username" required>
+              <span class="form-note">3–30 chars • letters, digits, underscores</span>
+            </div>
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+              <span class="form-note">Min. 8 characters</span>
+            </div>
+            <div class="field">
+              <label for="displayName">Display name (optional)</label>
+              <input id="displayName" name="displayName" type="text">
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">File record</button>
+          </form>
+        </div>
+      </div>
+      <p class="auth-links"><a th:href="@{/login}">Already employed? Clock in.</a></p>
+    </div>
   </section>
 </body>
 </html>

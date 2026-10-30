@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>TypeShift — Prose Exercise</title>
+</head>
+<body>
+  <section th:fragment="content">
+    <!-- Top bureau metric ledger strip (sticky readout) -->
+    <aside class="readout-bar" aria-label="Bureau metrics">
+      <div class="readout-row">
+        <div class="readouts">
+          <div class="readout">
+            <span class="label-caps" style="color: var(--muted)">Speed / Tempó</span>
+            <div><span class="val" id="live-wpm">0</span> <span class="unit">WPM</span></div>
+          </div>
+          <div class="readout">
+            <span class="label-caps" style="color: var(--muted)">Precision / Pontosság</span>
+            <div><span class="val" id="live-acc" style="color: var(--green)">100.0</span> <span class="unit">%</span></div>
+          </div>
+          <div class="readout">
+            <span class="label-caps" style="color: var(--muted)">Elapsed / Eltelt</span>
+            <div><span class="val" id="live-timer">00:00</span></div>
+          </div>
+          <div class="readout-gauge">
+            <div class="label-caps" style="display:flex; justify-content:space-between; margin-bottom:4px">
+              <span style="color: var(--muted)">Ledger quota (<span id="gauge-label">0%</span>)</span>
+              <span style="color: #5f4100">Req: 95.0%</span>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill" id="gauge-bar" style="width: 0%"></div>
+              <div class="gauge-marker" title="Minimum audit certification threshold (95%)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="shift-state label-caps">Shift in progress // Stage 4: Accents [HU]</div>
+      </div>
+    </aside>
+
+    <div class="page">
+      <!-- Standard notice 14-HU: one-time keyboard reminder (story 5.8) -->
+      <div class="notice" id="keyboard-banner">
+        <div style="display:flex; gap: var(--space-sm); align-items:flex-start">
+          <span aria-hidden="true">⌨</span>
+          <div>
+            <span class="label-caps"><strong>Standard notice 14-HU:</strong></span>
+            <span> Please verify your OS layout is active as <strong>Hungarian QWERTZ</strong>
+              (<code class="mono">q-w-e-r-t-z</code> layout with native
+              <code class="mono">ő, ú, ó, ü, ö, é, á, ű, í</code> keys).</span>
+          </div>
+        </div>
+        <button class="close" type="button" aria-label="Dismiss notice"
+                onclick="document.getElementById('keyboard-banner').style.display='none'">×</button>
+      </div>
+
+      <!-- Main exercise docket -->
+      <div class="docket type-card">
+        <div class="docket-head">
+          <div style="display:flex; gap: var(--space-sm); flex-wrap:wrap; align-items:center">
+            <span class="label-caps"><strong>Docket assignment no. 408-B</strong></span>
+            <span class="label-caps" style="color: var(--muted)">Hungarian prose transcribing [civil service record]</span>
+          </div>
+          <span class="tag tag-green">Classified active</span>
+        </div>
+        <div id="typing-container" onclick="document.getElementById('practice-input').focus()">
+          <p class="type-pane" id="prose-display" aria-live="off"></p>
+          <input id="practice-input" aria-label="Type transcription here" type="text"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="docket-foot label-caps">
+          <div style="display:flex; gap: var(--space-md); flex-wrap:wrap">
+            <span>Batch: SEC-04 // Paragraph 1 of 3</span>
+            <span>Key retries: <span id="retry-count">00</span></span>
+            <span>Gross characters: <span id="gross-count">0</span></span>
+          </div>
+          <span>Carriage feed: mechanical lock enabled</span>
+        </div>
+      </div>
+
+      <!-- Terminal control footer -->
+      <div class="controls-row">
+        <a class="btn btn-ghost" th:href="@{/stage-map}">Abandon shift</a>
+        <div class="key-hints label-caps">
+          <span><span class="kbd">ESC</span> Pause / abandon</span>
+          <span><span class="kbd">TAB</span> Restart docket</span>
+          <span><span class="kbd">ENTER</span> Commit carriage</span>
+        </div>
+      </div>
+
+      <!-- Archival clerk compliance notes -->
+      <div class="notes-grid">
+        <div class="note">
+          <span class="label-caps" style="color: var(--green)">Standard requirement</span>
+          <p>Min. accuracy required for Grade II certification is 95.0%. Transcription errors will
+            register as immediate debits on the final archival log.</p>
+          <span class="label-caps" style="color: var(--muted)">Regulation ref: TS-PAR-81</span>
+        </div>
+        <div class="note">
+          <span class="label-caps" style="color: var(--green)">Diacritic key protocol</span>
+          <p>Double acute accents (ő, ű) must be struck directly via their dedicated keys. Do not
+            employ combining dead keys during examination trials.</p>
+          <span class="label-caps" style="color: var(--muted)">Hungarian QWERTZ form 1</span>
+        </div>
+        <div class="note">
+          <span class="label-caps" style="color: var(--green)">Automatic re-audit</span>
+          <p>A cadence decrease below 45 WPM for longer than 8 seconds will trigger a mechanical
+            inspection delay alert on your permanent employment record.</p>
+          <span class="label-caps" style="color: var(--muted)">Time audit protocol 4</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
