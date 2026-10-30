@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import lombok.Getter;
 
 /**
  * Server-side blocklist entry of ADR-001: a logged-out token id that must be
@@ -14,6 +15,7 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "revoked_token")
+@Getter
 public class RevokedToken {
 
   @Id
@@ -41,21 +43,5 @@ public class RevokedToken {
     this.revokedAt = Instant.now();
     this.jti = jti;
     this.expiresAt = expiresAt;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public String getJti() {
-    return jti;
-  }
-
-  public Instant getRevokedAt() {
-    return revokedAt;
-  }
-
-  public Instant getExpiresAt() {
-    return expiresAt;
   }
 }

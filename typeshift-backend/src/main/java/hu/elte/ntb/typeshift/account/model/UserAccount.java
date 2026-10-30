@@ -9,6 +9,8 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * JPA entity holding a TypeShift account: unique username, BCrypt password
@@ -16,6 +18,7 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "users")
+@Getter
 public class UserAccount {
 
   @Id
@@ -26,6 +29,7 @@ public class UserAccount {
   private String username;
 
   @Column(nullable = false)
+  @Setter
   private String passwordHash;
 
   @Column
@@ -90,35 +94,11 @@ public class UserAccount {
     return displayName.trim();
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public String getPasswordHash() {
-    return passwordHash;
-  }
-
-  public void setPasswordHash(String passwordHash) {
-    this.passwordHash = passwordHash;
-  }
-
   public String getDisplayName() {
     return displayName == null ? username : displayName;
   }
 
   public void setDisplayName(String displayName) {
     this.displayName = defaultDisplayName(displayName);
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
-  }
-
-  public Instant getUpdatedAt() {
-    return updatedAt;
   }
 }
