@@ -50,7 +50,7 @@ public class SignupController {
       @RequestParam("username") @NotBlank String username,
       @RequestParam("password") @NotBlank String password,
       Model model) {
-    SignupOutcome outcome = accounts.createAccount(username, password);
+    SignupOutcome outcome = accounts.createAccount(username, password, null);
     if (outcome.created()) {
       return "redirect:/login?signup";
     }
