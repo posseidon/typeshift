@@ -30,8 +30,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestPropertySource(
     properties = {
       "spring.datasource.url=jdbc:sqlite::memory:",
-      "spring.datasource.hikari.maximum-pool-size=1",
+      "spring.datasource.driver-class-name=org.sqlite.JDBC",
+      "spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect",
       "spring.jpa.hibernate.ddl-auto=create-drop",
+      "spring.flyway.enabled=false",
+      "spring.datasource.hikari.maximum-pool-size=1",
       "typeshift.jwt-secret=test-secret-key-at-least-40-bytes-for-hmac-sha256-algorithms",
       "typeshift.cookie-secure=false"
     })
