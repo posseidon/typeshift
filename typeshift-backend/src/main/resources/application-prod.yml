@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 2
+typeshift:
+  ai:
+    azure-endpoint: ${AZURE_OPENAI_ENDPOINT:}
+    azure-api-key: ${AZURE_OPENAI_API_KEY:}
+    azure-deployment: ${AZURE_OPENAI_DEPLOYMENT:}
