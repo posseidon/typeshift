@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import hu.elte.ntb.typeshift.model.SignupOutcome;
 import hu.elte.ntb.typeshift.model.UserAccount;
+import hu.elte.ntb.typeshift.repository.LearningProfileRepository;
 import hu.elte.ntb.typeshift.repository.UserAccountRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ class UserAccountServiceTest {
   @Mock UserAccountRepository repository;
   @Mock PasswordEncoder passwordEncoder;
   @Mock LearningProfileService learningProfileService;
+  @Mock LearningProfileRepository learningProfiles;
   @InjectMocks UserAccountService service;
 
   @Test

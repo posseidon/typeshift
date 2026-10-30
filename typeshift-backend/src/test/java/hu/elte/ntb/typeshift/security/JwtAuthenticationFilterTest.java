@@ -99,10 +99,7 @@ class JwtAuthenticationFilterTest {
   @Test
   void validCookieGrantsPageAccess() throws Exception {
     String token = tokens.issue(OWNER);
-    // 404 proves the request passed the filter (an unauthenticated request
-    // would redirect/401 instead); Task 10 adds /profile and flips this
-    // expectation to isOk().
     mvc.perform(get("/profile").cookie(new Cookie(AuthCookie.NAME, token)))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isOk());
   }
 }

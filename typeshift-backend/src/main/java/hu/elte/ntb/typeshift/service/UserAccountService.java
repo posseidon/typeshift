@@ -1,8 +1,14 @@
 package hu.elte.ntb.typeshift.service;
 
+import hu.elte.ntb.typeshift.model.ChangePasswordOutcome;
+import hu.elte.ntb.typeshift.model.LearningProfile;
+import hu.elte.ntb.typeshift.model.ProfileView;
 import hu.elte.ntb.typeshift.model.SignupOutcome;
 import hu.elte.ntb.typeshift.model.UserAccount;
+import hu.elte.ntb.typeshift.repository.LearningProfileRepository;
 import hu.elte.ntb.typeshift.repository.UserAccountRepository;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,24 +17,30 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Registers the owner: validates the fields, BCrypt-hashes the password, and
  * creates the user together with the learning profile in one transaction
- * (Stories 0.1 and 0.6).
+ * (Stories 0.1 and 0.6). Also serves the profile view and updates (Story 0.5).
  */
 @Service
 public class UserAccountService {
 
   private static final Pattern USERNAME_PATTERN = Pattern.compile("^\\w{3,30}$");
 
+  private static final DateTimeFormatter MEMBER_SINCE =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneOffset.UTC);
+
   private final UserAccountRepository repository;
   private final PasswordEncoder passwordEncoder;
   private final LearningProfileService learningProfileService;
+  private final LearningProfileRepository learningProfiles;
 
   public UserAccountService(
       UserAccountRepository repository,
       PasswordEncoder passwordEncoder,
-      LearningProfileService learningProfileService) {
+      LearningProfileService learningProfileService,
+      LearningProfileRepository learningProfiles) {
     this.repository = repository;
     this.passwordEncoder = passwordEncoder;
     this.learningProfileService = learningProfileService;
+    this.learningProfiles = learningProfiles;
   }
 
   /**
@@ -58,6 +70,73 @@ public class UserAccountService {
     UserAccount saved = repository.save(account);
     learningProfileService.initializeFor(saved);
     return new SignupOutcome(true, null);
+  }
+
+  /**
+   * Builds the read-only profile view for the page (Story 0.5); a missing
+   * learning profile (pre-Story-0.6 account) falls back to stage 1.
+   *
+   * @param username the login name
+   * @return the profile snapshot
+   */
+  @Transactional
+  public ProfileView profileOf(String username) {
+    UserAccount account = requireAccount(username);
+    int stage =
+        learningProfiles
+            .findByUser(account)
+            .map(LearningProfile::getCurrentStage)
+            .orElse(1);
+    return new ProfileView(
+        account.getUsername(),
+        account.getDisplayName(),
+        MEMBER_SINCE.format(account.getCreatedAt()),
+        stage);
+  }
+
+  /**
+   * Replaces the display name when a non-blank value is submitted; blank
+   * means "keep the current one".
+   *
+   * @param username the login name
+   * @param displayName the new display name, optional
+   */
+  @Transactional
+  public void updateDisplayName(String username, String displayName) {
+    UserAccount account = requireAccount(username);
+    if (displayName != null && !displayName.isBlank()) {
+      account.setDisplayName(displayName.trim());
+      repository.save(account);
+    }
+  }
+
+  /**
+   * Changes the password after verifying the current one (Story 0.5); the
+   * outcome carries the refusal message otherwise.
+   *
+   * @param username the login name
+   * @param currentPassword the submitted current password
+   * @param newPassword the replacement, at least 8 characters
+   * @return the change outcome
+   */
+  @Transactional
+  public ChangePasswordOutcome changePassword(
+      String username, String currentPassword, String newPassword) {
+    UserAccount account = requireAccount(username);
+    if (!passwordEncoder.matches(currentPassword, account.getPasswordHash())) {
+      return new ChangePasswordOutcome(false, "Current password is incorrect.");
+    }
+    if (!isValidPassword(newPassword)) {
+      return new ChangePasswordOutcome(false, "New password must be at least 8 characters.");
+    }
+    account.setPasswordHash(passwordEncoder.encode(newPassword));
+    repository.save(account);
+    return new ChangePasswordOutcome(true, null);
+  }
+
+  private UserAccount requireAccount(String username) {
+    return repository.findByUsername(username).orElseThrow(
+        () -> new IllegalArgumentException("Unknown account"));
   }
 
   private static boolean isValidPassword(String password) {
