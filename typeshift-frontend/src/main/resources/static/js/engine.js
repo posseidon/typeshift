@@ -20,10 +20,8 @@
   var retryCount = document.getElementById('retry-count');
   var grossCount = document.getElementById('gross-count');
 
-  var targetText =
-    'A hivatalos iratokat kérjük a főbejárat melletti iktatóba eljuttatni még a ' +
-    'mai nap folyamán. Az ügyintézés határideje tizenöt munkanap, kivéve ha ' +
-    'sürgősségi kérelmet nyújtott be az illetékes osztályvezetőnél...';
+  var docket = document.getElementById('typing-docket');
+  var targetText = docket && docket.dataset.target;
 
   var typedText = '';
   var secondsElapsed = 0;

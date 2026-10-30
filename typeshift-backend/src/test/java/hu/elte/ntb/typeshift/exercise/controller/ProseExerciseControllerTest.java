@@ -1,6 +1,7 @@
 package hu.elte.ntb.typeshift.exercise.controller;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -64,6 +65,23 @@ class ProseExerciseControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("A hivatalos iratokat")))
         .andExpect(content().string(containsString("Stage 4")));
+  }
+
+  @Test
+  void proseDocketServesTargetText() throws Exception {
+    mvc.perform(get("/exercise/4/exam-1").cookie(session()))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("id=\"typing-docket\"")))
+        .andExpect(content().string(containsString("data-target=\"A hivatalos iratokat")))
+        .andExpect(content().string(containsString("data-mode=\"prose\"")))
+        .andExpect(content().string(not(containsString("data-expected"))))
+        .andExpect(content().string(containsString("New copy")));
+    mvc.perform(get("/exercise/2/grad").cookie(session()))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("magas\nTárgy: Bejelentkezési hiba")));
+    mvc.perform(get("/exercise/5/exam-1").cookie(session()))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("docket--chat-burst")));
   }
 
   @Test

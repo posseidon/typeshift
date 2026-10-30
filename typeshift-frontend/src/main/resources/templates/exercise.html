@@ -32,7 +32,7 @@
             </div>
           </div>
         </div>
-        <div class="shift-state label-caps">Shift in progress // Stage 4: Accents [HU]</div>
+        <div class="shift-state label-caps" th:text="${shiftState}">Shift in progress // Stage 4: Accents [HU]</div>
       </div>
     </aside>
 
@@ -53,16 +53,19 @@
       </div>
 
       <!-- Main exercise docket -->
-      <div class="docket type-card">
+      <div id="typing-docket" class="docket type-card"
+           th:attr="data-target=${dataTarget},data-mode=${dataMode},data-expected=${dataExpected}"
+           th:classappend="${taskClass != null ? ' docket--' + taskClass : ''}">
         <div class="docket-head">
           <div style="display:flex; gap: var(--space-sm); flex-wrap:wrap; align-items:center">
-            <span class="label-caps"><strong>Docket assignment no. 408-B</strong></span>
-            <span class="label-caps" style="color: var(--muted)">Hungarian prose transcribing [civil service record]</span>
+            <span class="label-caps"><strong th:text="${docketLabel}">Docket assignment no. 408-B</strong></span>
+            <span class="label-caps" style="color: var(--muted)" th:text="${docketFraming}">Hungarian prose transcribing [civil service record]</span>
           </div>
+          <button type="button" onclick="window.location.reload()">New copy</button>
           <span class="tag tag-green">Classified active</span>
         </div>
         <div id="typing-container" onclick="document.getElementById('practice-input').focus()">
-          <p class="type-pane" id="prose-display" aria-live="off"></p>
+          <p class="type-pane" id="prose-display" aria-live="off" style="white-space: pre-line"></p>
           <input id="practice-input" aria-label="Type transcription here" type="text"
                  autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
