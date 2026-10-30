@@ -2,11 +2,13 @@ package hu.elte.ntb.typeshift;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 /**
  * TypeShift entry point: boots the deployable backend serving the shell and REST services.
  */
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public final class TypeShiftCoreApplication {
 
   private TypeShiftCoreApplication() {}
