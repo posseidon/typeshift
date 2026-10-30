@@ -38,6 +38,7 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter authFilter)
       throws Exception {
     http.csrf(csrf -> csrf.disable())
+        .logout(logout -> logout.disable())
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(

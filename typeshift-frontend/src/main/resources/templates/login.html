@@ -6,7 +6,7 @@
 <body>
   <section th:fragment="content">
     <h1>Start your shift</h1>
-    <p th:if="${error}" class="error" role="alert">Wrong username or password.</p>
+    <p th:if="${error}" class="error" role="alert" th:text="${errorText} ?: 'Invalid username or password.'"></p>
     <form th:action="@{/login}" method="post">
       <label for="username">Username</label>
       <input id="username" name="username" type="text" autocomplete="username" required>
