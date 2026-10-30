@@ -32,6 +32,9 @@ logs/
 *.sqlite
 typeshift.db
 
+### Secrets ###
+.env
+
 ### IDEs ###
 
 # IntelliJ IDEA
