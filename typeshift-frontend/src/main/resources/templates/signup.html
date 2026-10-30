@@ -12,6 +12,8 @@
       <input id="username" name="username" type="text" autocomplete="username" required>
       <label for="password">Password</label>
       <input id="password" name="password" type="password" autocomplete="new-password" required>
+      <label for="displayName">Display name (optional)</label>
+      <input id="displayName" name="displayName" type="text" autocomplete="nickname">
       <button type="submit">Create record</button>
     </form>
     <p><a th:href="@{/login}">Already have a record? Start your shift.</a></p>

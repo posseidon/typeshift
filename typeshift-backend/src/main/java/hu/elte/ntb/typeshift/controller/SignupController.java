@@ -2,20 +2,17 @@ package hu.elte.ntb.typeshift.controller;
 
 import hu.elte.ntb.typeshift.model.SignupOutcome;
 import hu.elte.ntb.typeshift.service.UserAccountService;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * Minimal signup route: creates an account with a BCrypt-hashed password and
- * refuses duplicate usernames.
+ * Signup route (Story 0.1): creates the account with its learning profile
+ * atomically (Story 0.6) and forwards to the login view on success.
  */
 @Controller
-@Validated
 public class SignupController {
 
   private final UserAccountService accounts;
@@ -38,21 +35,24 @@ public class SignupController {
   }
 
   /**
-   * Creates the account and forwards to login, or re-renders signup with the refusal.
+   * Creates the account and forwards to login, or re-renders signup with the
+   * refusal message.
    *
    * @param username requested unique login name
    * @param password plaintext password, hashed before storage
+   * @param displayName optional profile display name
    * @param model the view model
    * @return redirect to login on success, else the signup view
    */
   @PostMapping("/signup")
   public String signup(
-      @RequestParam("username") @NotBlank String username,
-      @RequestParam("password") @NotBlank String password,
+      @RequestParam("username") String username,
+      @RequestParam("password") String password,
+      @RequestParam(value = "displayName", required = false) String displayName,
       Model model) {
-    SignupOutcome outcome = accounts.createAccount(username, password, null);
+    SignupOutcome outcome = accounts.createAccount(username, password, displayName);
     if (outcome.created()) {
-      return "redirect:/login?signup";
+      return "redirect:/login";
     }
     model.addAttribute("title", "TypeShift — New Employment Record");
     model.addAttribute("contentFragment", "signup");
