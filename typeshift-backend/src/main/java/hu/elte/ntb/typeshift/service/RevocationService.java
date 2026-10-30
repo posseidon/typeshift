@@ -1,5 +1,6 @@
 package hu.elte.ntb.typeshift.service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hu.elte.ntb.typeshift.model.RevokedToken;
 import hu.elte.ntb.typeshift.repository.RevokedTokenRepository;
 import java.time.Instant;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Maintains the server-side token blocklist of ADR-001: idempotent insert on
  * logout and a daily purge of entries whose original token has expired.
  */
+// Spring DI: the injected repository is a singleton, not mutable internal state.
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 @Service
 public class RevocationService {
 

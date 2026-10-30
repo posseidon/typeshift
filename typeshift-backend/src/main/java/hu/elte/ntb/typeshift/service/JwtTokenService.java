@@ -1,5 +1,6 @@
 package hu.elte.ntb.typeshift.service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hu.elte.ntb.typeshift.config.AuthProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
  * Issues and verifies the signed JWT session tokens of ADR-001: fixed HS256,
  * 30-day lifetime, subject and token id required.
  */
+// Fail-fast startup: the constructor throws on a short/missing secret.
+@SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
 @Service
 public class JwtTokenService {
 

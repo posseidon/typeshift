@@ -1,5 +1,6 @@
 package hu.elte.ntb.typeshift.model;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -19,6 +20,9 @@ import java.util.Set;
  * Learning state of the owner per ADR-013: the current stage, unlocked
  * stages, the program start date, and accumulated practice minutes.
  */
+// JPA entity: getters expose persisted fields by design; defensive copies
+// would break Hibernate collection tracking.
+@SuppressFBWarnings("EI_EXPOSE_REP")
 @Entity
 @Table(name = "learning_profiles")
 public class LearningProfile {
@@ -55,6 +59,7 @@ public class LearningProfile {
    *
    * @param user the owning account
    */
+  @SuppressFBWarnings("EI_EXPOSE_REP2")
   public LearningProfile(UserAccount user) {
     this.user = user;
     this.currentStage = 1;
@@ -84,6 +89,7 @@ public class LearningProfile {
     return unlockedStages;
   }
 
+  @SuppressFBWarnings("EI_EXPOSE_REP2")
   public void setUnlockedStages(Set<Integer> unlockedStages) {
     this.unlockedStages = unlockedStages;
   }
