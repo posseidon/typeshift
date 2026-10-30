@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>TypeShift — Profile</title>
+</head>
+<body>
+  <section th:fragment="content">
+    <h1>Employment record</h1>
+    <p th:if="${passwordMessage}" th:classappend="${passwordError ? 'error' : 'ok'}" th:text="${passwordMessage}"></p>
+    <dl>
+      <dt>Username</dt>
+      <dd th:text="${username}"></dd>
+      <dt>Member since</dt>
+      <dd th:text="${memberSince}"></dd>
+      <dt>Current stage</dt>
+      <dd th:text="${currentStage}"></dd>
+      <dt>Keyboard layout</dt>
+      <dd>HU_QWERTZ</dd>
+      <dt>Interface language</dt>
+      <dd>English</dd>
+    </dl>
+
+    <h2>Display name</h2>
+    <form th:action="@{/profile/display-name}" method="post">
+      <label for="displayName">Display name</label>
+      <input id="displayName" name="displayName" type="text" th:value="${displayName}">
+      <button type="submit">Save</button>
+    </form>
+
+    <h2>Change password</h2>
+    <form th:action="@{/profile/password}" method="post">
+      <label for="currentPassword">Current password</label>
+      <input id="currentPassword" name="currentPassword" type="password" autocomplete="current-password" required>
+      <label for="newPassword">New password (min 8 characters)</label>
+      <input id="newPassword" name="newPassword" type="password" autocomplete="new-password" minlength="8" required>
+      <button type="submit">Change password</button>
+    </form>
+  </section>
+</body>
+</html>
