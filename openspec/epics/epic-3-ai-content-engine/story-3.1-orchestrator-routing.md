@@ -1,5 +1,5 @@
 # Story 3.1 — Orchestrator routing
-Points: 8 | Tool: opsx:plan + opsx:apply | ADRs: 004, 008, 012
+Points: 8 | Tool: opsx:plan + opsx:apply | ADRs: 004, 008, 012, 017
 
 Acceptance criteria
 - [ ] Maps stage and exam type to the correct agent (Prose or Math).

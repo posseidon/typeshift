@@ -1,5 +1,5 @@
 # Story 3.4 — Content deduplication
-Points: 5 | Tool: executing-plans | ADRs: 004, 012
+Points: 5 | Tool: executing-plans | ADRs: 004, 012, 015
 
 Acceptance criteria
 - [ ] Each user's last 5 served hashes are kept in a small table or session-scoped list.

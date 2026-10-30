@@ -1,4 +1,5 @@
 # Story 1.3 — Stage reference schema
+Points: 2 | Tool: executing-plans | ADRs: 009, 013
 
 Table: stage: id (1 to 5), name, sub_exam_count, graduation_name.
 

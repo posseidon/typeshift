@@ -1,4 +1,5 @@
 # Story 1.5 — Score record schema
+Points: 3 | Tool: executing-plans | ADRs: 009, 015, 016
 
 Table: score_record: id, user_id, stage_id, attempt_kind (SUB_EXAM or GRADUATION), sub_exam_number (nullable), accuracy, substitutions, insertions, deletions, passed, submitted_at.
 

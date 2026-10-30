@@ -1,4 +1,5 @@
 # Story 1.2 — Learning profile schema
+Points: 3 | Tool: executing-plans | ADRs: 009, 013
 
 Table: learning_profile: user_id (primary key, foreign key to app_user), current_stage, unlocked_stages, program_start_date (nullable), total_practice_minutes, keyboard_layout (default HU_QWERTZ), updated_at.
 

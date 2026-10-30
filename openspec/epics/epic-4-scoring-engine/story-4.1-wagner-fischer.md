@@ -1,5 +1,5 @@
 # Story 4.1 — Wagner-Fischer text evaluator
-Points: 11 | Tool: opsx:plan + opsx:apply | ADRs: 016
+Points: 11 | Tool: opsx:plan + opsx:apply | ADRs: 003, 016
 
 Acceptance criteria
 - [ ] Computes edit distance between target and typed text with an alignment trace.

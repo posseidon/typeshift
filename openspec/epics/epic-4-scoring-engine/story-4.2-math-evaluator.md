@@ -1,5 +1,5 @@
 # Story 4.2 — Math result evaluator
-Points: 5 | Tool: opsx:plan + opsx:apply | ADRs: 006, 016
+Points: 5 | Tool: opsx:plan + opsx:apply | ADRs: 003, 006, 016
 
 Acceptance criteria
 - [ ] Parses the user's numpad input, accepting comma as decimal separator.

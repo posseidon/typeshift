@@ -1,4 +1,5 @@
 # Story 1.4 — Practice session summary schema
+Points: 3 | Tool: executing-plans | ADRs: 002, 003, 009
 
 Table: practice_session: id, user_id, stage_id, exercise_kind (PROSE or MATH), wpm, cpm, correct_characters, total_characters, duration_seconds, submitted_at.
 

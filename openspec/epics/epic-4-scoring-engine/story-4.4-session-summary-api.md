@@ -1,5 +1,5 @@
 # Story 4.4 — Session summary endpoint
-Points: 5 | Tool: executing-plans | ADRs: 002, 011
+Points: 5 | Tool: executing-plans | ADRs: 002, 003, 011
 
 Acceptance criteria
 - [ ] Accepts wpm, cpm, durationSeconds, characterCount, and the miss map from ADR-003.

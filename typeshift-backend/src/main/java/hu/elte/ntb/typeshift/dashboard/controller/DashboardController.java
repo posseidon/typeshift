@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * Serves the shift review dashboard through the shared layout shell.
  */
 @Controller
-public class IndexController {
+public class DashboardController {
 
   /**
    * Renders the index view composed into the layout shell.

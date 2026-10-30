@@ -1,4 +1,5 @@
 # Story 1.6 — Weak key profile schema
+Points: 2 | Tool: executing-plans | ADRs: 009, 012
 
 Table: weak_key_profile: user_id, key_char, miss_count, updated_at. Primary key (user_id, key_char).
 

@@ -1,5 +1,5 @@
 # Story 5.4 — Prose exercise page
-Points: 8 | Tool: opsx:plan + opsx:apply | ADRs: 002, 003, 007, 014, 015, 016
+Points: 8 | Tool: opsx:plan + opsx:apply | ADRs: 002, 003, 007, 014, 015, 016, 017
 
 Acceptance criteria
 - [ ] Requests an exercise from the server and displays displayText.

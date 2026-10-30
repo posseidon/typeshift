@@ -1,4 +1,5 @@
 # Story 1.7 — Graduation attempt schema
+Points: 3 | Tool: executing-plans | ADRs: 009, 013
 
 Table: graduation_attempt: id, user_id, stage_id, status (IN_PROGRESS, PASSED, FAILED), started_at, finished_at, passed.
 

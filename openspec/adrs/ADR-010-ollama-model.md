@@ -1,8 +1,8 @@
 # ADR-010: Dev model and prod provider
-Status: Locked
+Status: Locked (revised)
 
 **Decision**
-- Dev: Ollama with qwen2.5:14b. Fallback qwen2.5:7b on machines with 8 GB RAM.
+- Dev: Ollama with qwen2.5:14b. Fallback Mistral 7B on machines with 8 GB RAM.
 - Prod: Azure OpenAI (GPT-4o class deployment).
 - Model name is an environment variable, never hardcoded.
 

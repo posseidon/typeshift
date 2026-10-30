@@ -15,7 +15,7 @@
 ## 3. Frontend shell (typeshift-frontend module)
 
 - [x] 3.1 Create `templates/layout.html`: HTML5 boilerplate, `<meta charset="UTF-8">`, HTMX via CDN in `<head>`, references to `/css/style.css` and `/js/engine.js`, and a content injection point (`th:replace` layout pattern with a `th:fragment="content"` slot). Verify: template structure follows the decorator pattern task 3.2 composes against.
-- [x] 3.2 Create `templates/index.html` declaring `th:fragment="content"` and an `IndexController` in the backend mapping `/` to the index view. Verify: `mvn -q spring-boot:run` then GET `http://localhost:8080/` returns the index view composed with the shell.
+- [x] 3.2 Create `templates/index.html` declaring `th:fragment="content"` and an `DashboardController` in the backend mapping `/` to the index view. Verify: `mvn -q spring-boot:run` then GET `http://localhost:8080/` returns the index view composed with the shell.
 - [x] 3.3 Create `static/css/style.css` (minimal base styling) and `static/js/engine.js` (placeholder comment reserving the typing engine slot), plus a note file in `materials/`, all inside the frontend module. Verify: the HTML from 3.2 references `/css/style.css` and `/js/engine.js`; `materials/` exists.
 
 ## 4. OpenAPI contract (backend module)
