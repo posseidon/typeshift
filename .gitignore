@@ -34,6 +34,8 @@ typeshift.db
 
 ### Secrets ###
 .env
+.env.*
+!.env.example
 
 ### IDEs ###
 

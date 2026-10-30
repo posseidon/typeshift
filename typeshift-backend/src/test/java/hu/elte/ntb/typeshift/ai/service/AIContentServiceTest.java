@@ -66,7 +66,8 @@ class AIContentServiceTest {
     server
         .expect(
             requestTo(
-                "http://azure.example/openai/deployments/gpt-4o-deploy/chat/completions"))
+                "http://azure.example/openai/deployments/gpt-4o-deploy/chat/completions"
+                    + "?api-version=2024-02-01"))
         .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
     AIContentService service = new AzureOpenAIContentService(builder, props, mapper);

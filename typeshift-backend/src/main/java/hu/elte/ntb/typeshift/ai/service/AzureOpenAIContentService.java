@@ -21,6 +21,8 @@ import org.springframework.web.client.RestClient;
 @Profile("prod")
 public class AzureOpenAIContentService implements AIContentService {
 
+  private static final String API_VERSION = "2024-02-01";
+
   private final RestClient client;
   private final String endpoint;
   private final String apiKey;
@@ -50,8 +52,8 @@ public class AzureOpenAIContentService implements AIContentService {
   public AiResponse generate(AiRequest request) {
     try {
       String prompt = mapper.writeValueAsString(request);
-      // shortcut: api-version query param omitted; add it when wiring the real deployment (0b.7).
-      String uri = endpoint + "/openai/deployments/" + deployment + "/chat/completions";
+      String uri =
+          endpoint + "/openai/deployments/" + deployment + "/chat/completions?api-version=" + API_VERSION;
       String body =
           client
               .post()
