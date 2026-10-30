@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class CannedCatalog {
 
-  /** Station names from ADR-013, keyed by stage id. */
-  static final Map<Integer, String> STAGE_NAMES = Map.of(
+  /** Public station names from ADR-013, keyed by stage id, for controllers and views. */
+  public static final Map<Integer, String> STAGE_NAMES = Map.of(
       1, "QWERTZ Core",
       2, "Symbol Sorcerer",
       3, "Numpad & Math",
