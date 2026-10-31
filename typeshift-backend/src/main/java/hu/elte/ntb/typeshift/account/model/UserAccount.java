@@ -17,7 +17,7 @@ import lombok.Setter;
  * hash, display name, and audit timestamps.
  */
 @Entity
-@Table(name = "users")
+@Table(name = "app_user")
 @Getter
 public class UserAccount {
 

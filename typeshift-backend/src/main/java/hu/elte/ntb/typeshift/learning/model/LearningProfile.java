@@ -12,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.HashSet;
@@ -27,7 +29,7 @@ import lombok.Setter;
 // would break Hibernate collection tracking.
 @SuppressFBWarnings("EI_EXPOSE_REP")
 @Entity
-@Table(name = "learning_profiles")
+@Table(name = "learning_profile")
 @Getter
 public class LearningProfile {
 
@@ -59,6 +61,12 @@ public class LearningProfile {
   @Setter
   private int totalPracticeMinutes;
 
+  @Column(nullable = false)
+  private String keyboardLayout = "HU_QWERTZ";
+
+  @Column(nullable = false)
+  private Instant updatedAt;
+
   protected LearningProfile() {}
 
   /**
@@ -75,6 +83,19 @@ public class LearningProfile {
     this.unlockedStages.add(1);
     this.programStartDate = null;
     this.totalPracticeMinutes = 0;
+    this.updatedAt = Instant.now();
+  }
+
+  @PrePersist
+  void onCreate() {
+    if (updatedAt == null) {
+      updatedAt = Instant.now();
+    }
+  }
+
+  @PreUpdate
+  void onUpdate() {
+    updatedAt = Instant.now();
   }
 
   // Manual setter: Lombok @Setter would drop the @SuppressFBWarnings below.
