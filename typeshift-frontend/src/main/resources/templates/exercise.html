@@ -58,8 +58,9 @@
           <span aria-hidden="true">▣</span>
           <div>
             <span class="label-caps"><strong>Standard notice 15-NU:</strong></span>
-            <span> Please confirm <strong>NumLock</strong> is active before tallying. With NumLock
-              off the keypad sends arrow-key codes and no digits will register.</span>
+            <span> Please confirm the <strong>NumLock</strong> state before tallying. Keypad digits
+              arrive keyed by physical key position regardless of NumLock, so be deliberate when
+              typing numbers.</span>
           </div>
         </div>
         <button class="close" type="button" aria-label="Dismiss notice"
@@ -75,7 +76,7 @@
             <span class="label-caps"><strong th:text="${docketLabel}">Docket assignment no. 408-B</strong></span>
             <span class="label-caps" style="color: var(--muted)" th:text="${docketFraming}">Hungarian prose transcribing [civil service record]</span>
           </div>
-          <button type="button" onclick="window.location.reload()">New copy</button>
+          <button class="btn btn-ghost" type="button" onclick="window.location.reload()">New copy</button>
           <span class="tag tag-green">Classified active</span>
         </div>
         <div id="typing-container">

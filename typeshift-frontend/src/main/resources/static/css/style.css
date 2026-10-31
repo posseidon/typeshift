@@ -755,8 +755,9 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
   padding: var(--space-md) var(--space-lg);
 }
 
-/* Document paragraph stays the plain wide-measure baseline, so graduation
-   (taskClass null, no variant class) renders identically. */
+/* Document paragraph: a narrow read-measure sheet, like one clause lifted out
+   of a contract. Graduation (taskClass null) keeps the wide baseline. */
+.docket--document-paragraph #prose-display { max-width: 65ch; }
 
 /* Code comment: monospace lines on a tinted sheet; wrapping untouched. The
    "//" prefixes are authored content, not markup. */

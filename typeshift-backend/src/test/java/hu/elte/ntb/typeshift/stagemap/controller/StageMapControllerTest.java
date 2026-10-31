@@ -7,11 +7,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hu.elte.ntb.typeshift.account.model.UserAccount;
 import hu.elte.ntb.typeshift.account.repository.UserAccountRepository;
+import hu.elte.ntb.typeshift.exercise.service.CannedCatalog;
 import hu.elte.ntb.typeshift.security.AuthCookie;
 import hu.elte.ntb.typeshift.security.JwtTokenService;
 import jakarta.servlet.http.Cookie;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -79,5 +85,24 @@ class StageMapControllerTest {
         .andExpect(content().string(containsString("/exercise/5/exam-3")))
         .andExpect(content().string(containsString("/exercise/5/exam-4")))
         .andExpect(content().string(containsString("/exercise/5/grad")));
+  }
+
+  @ParameterizedTest
+  @MethodSource("catalogEntries")
+  void everyCatalogEntryHasItsPracticeLink(int stageId, String examKey) throws Exception {
+    mvc.perform(get("/stage-map").cookie(session()))
+        .andExpect(status().isOk())
+        .andExpect(
+            content().string(containsString("href=\"/exercise/" + stageId + "/" + examKey + "\"")));
+  }
+
+  static Stream<Arguments> catalogEntries() {
+    CannedCatalog catalog = new CannedCatalog();
+    return IntStream.rangeClosed(1, 5)
+        .boxed()
+        .flatMap(
+            stage ->
+                catalog.byStage(stage).stream()
+                    .map(exercise -> Arguments.of(stage, exercise.examKey())));
   }
 }
