@@ -94,6 +94,25 @@ class ProseExerciseControllerTest {
   }
 
   @Test
+  void numericDocketServesPadAndVerdict() throws Exception {
+    mvc.perform(get("/exercise/3/exam-1").cookie(session()))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("id=\"math-verdict\"")))
+        .andExpect(content().string(containsString("id=\"practice-pad\"")))
+        .andExpect(content().string(containsString("data-code=\"NumpadDecimal\"")))
+        .andExpect(content().string(containsString("NumLock")));
+  }
+
+  @Test
+  void proseDocketOmitsKeyPad() throws Exception {
+    mvc.perform(get("/exercise/4/exam-1").cookie(session()))
+        .andExpect(status().isOk())
+        .andExpect(content().string(not(containsString("id=\"keypad\""))))
+        .andExpect(content().string(not(containsString("id=\"practice-pad\""))))
+        .andExpect(content().string(not(containsString("NumLock"))));
+  }
+
+  @Test
   void graduationDocketServes() throws Exception {
     mvc.perform(get("/exercise/4/grad").cookie(session())).andExpect(status().isOk());
   }

@@ -760,6 +760,59 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
   pointer-events: none;
 }
 
+/* ---- Numpad capture (Stage 3, ADR-006) ------------------------------- */
+
+.pad-block { display: flex; flex-direction: column; gap: var(--space-md); }
+
+.pad-value {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  min-height: 3rem;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 2px solid var(--ink);
+  background: var(--card);
+}
+
+.pad-value:empty::after { content: "—"; color: var(--muted); }
+
+#math-verdict {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--hairline);
+}
+
+#math-verdict.verdict-ok { color: var(--green); border-color: var(--green); background: var(--card); }
+
+#math-verdict.verdict-bad { color: var(--red); border-color: var(--red); background: var(--red-tint); }
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-sm);
+  max-width: 34rem;
+}
+
+.keypad button {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  box-shadow: 1px 1px 0 var(--hairline);
+  padding: var(--space-sm) 0;
+  cursor: pointer;
+}
+
+.keypad button:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+  background: var(--paper-dim);
+}
+
 .kbd {
   font-family: var(--font-mono);
   font-size: 0.75rem;
