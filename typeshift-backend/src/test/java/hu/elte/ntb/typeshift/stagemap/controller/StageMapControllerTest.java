@@ -1,0 +1,83 @@
+package hu.elte.ntb.typeshift.stagemap.controller;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import hu.elte.ntb.typeshift.account.model.UserAccount;
+import hu.elte.ntb.typeshift.account.repository.UserAccountRepository;
+import hu.elte.ntb.typeshift.security.AuthCookie;
+import hu.elte.ntb.typeshift.security.JwtTokenService;
+import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestPropertySource(
+    properties = {
+      "spring.datasource.url=jdbc:sqlite::memory:",
+      "spring.datasource.driver-class-name=org.sqlite.JDBC",
+      "spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect",
+      "spring.jpa.hibernate.ddl-auto=create-drop",
+      "spring.flyway.enabled=false",
+      "spring.datasource.hikari.maximum-pool-size=1",
+      "typeshift.jwt-secret=test-secret-key-at-least-40-bytes-for-hmac-sha256-algorithms",
+      "typeshift.cookie-secure=false"
+    })
+class StageMapControllerTest {
+
+  private static final String OWNER = "owner";
+  private static final String PASSWORD = "password123";
+
+  @Autowired MockMvc mvc;
+  @Autowired UserAccountRepository users;
+  @Autowired PasswordEncoder encoder;
+  @Autowired JwtTokenService tokens;
+
+  private String cookieValue;
+
+  @BeforeEach
+  void seedAndCookie() {
+    if (!users.existsByUsername(OWNER)) {
+      users.save(new UserAccount(OWNER, encoder.encode(PASSWORD), "Ops Chief"));
+    }
+    cookieValue = tokens.issue(OWNER);
+  }
+
+  private Cookie session() {
+    return new Cookie(AuthCookie.NAME, cookieValue);
+  }
+
+  @Test
+  void everyStationCardLinksToItsPracticeDockets() throws Exception {
+    mvc.perform(get("/stage-map").cookie(session()))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("Practice dockets")))
+        .andExpect(content().string(containsString("/exercise/1/exam-1")))
+        .andExpect(content().string(containsString("/exercise/1/exam-2")))
+        .andExpect(content().string(containsString("/exercise/1/exam-3")))
+        .andExpect(content().string(containsString("/exercise/1/grad")))
+        .andExpect(content().string(containsString("/exercise/2/exam-1")))
+        .andExpect(content().string(containsString("/exercise/2/exam-2")))
+        .andExpect(content().string(containsString("/exercise/2/grad")))
+        .andExpect(content().string(containsString("/exercise/3/exam-1")))
+        .andExpect(content().string(containsString("/exercise/3/exam-2")))
+        .andExpect(content().string(containsString("/exercise/3/grad")))
+        .andExpect(content().string(containsString("/exercise/4/exam-1")))
+        .andExpect(content().string(containsString("/exercise/4/exam-2")))
+        .andExpect(content().string(containsString("/exercise/4/grad")))
+        .andExpect(content().string(containsString("/exercise/5/exam-1")))
+        .andExpect(content().string(containsString("/exercise/5/exam-2")))
+        .andExpect(content().string(containsString("/exercise/5/exam-3")))
+        .andExpect(content().string(containsString("/exercise/5/exam-4")))
+        .andExpect(content().string(containsString("/exercise/5/grad")));
+  }
+}
