@@ -84,6 +84,14 @@ class SchemaMigrationTest {
   }
 
   @Test
+  void scoreGraduationLinkBecomesMandatory() throws IOException {
+    String sql = read("V10__score_graduation_link.sql");
+    assertThat(sql).contains("DROP CONSTRAINT ck_score_record_graduation_link");
+    assertThat(sql).contains("(attempt_kind = 'GRADUATION' AND graduation_attempt_id IS NOT NULL)");
+    assertThat(sql).contains("(attempt_kind = 'SUB_EXAM' AND graduation_attempt_id IS NULL)");
+  }
+
+  @Test
   void userAccountMapsAppUser() {
     assertThat(UserAccount.class.getAnnotation(Table.class).name()).isEqualTo("app_user");
   }
