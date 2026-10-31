@@ -81,6 +81,8 @@ class DashboardControllerTest {
             "142",
             "1958",
             "TS-40892",
+            "TS-882",
+            "All Transactions Audited",
             "#HU-40892",
             "CH-882",
             "01-992",
