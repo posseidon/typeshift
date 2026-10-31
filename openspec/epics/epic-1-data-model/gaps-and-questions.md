@@ -26,6 +26,11 @@ Parking lot for things to clarify before or while building epic 1. Return here b
 
 (pending human review of the defaults above)
 
+## Deferred from implementation review
+
+- `learning_profile.keyboard_layout`: entity field maps length 255, column is `VARCHAR(16)`. Hibernate validate ignores varchar lengths; a longer layout token would fail at insert. Only `HU_QWERTZ` is written today — extend the column (or set `length = 16` on the entity) when a second layout lands.
+- Stage seed `graduation_name` values follow `constants/stage-map.md` verbatim; ADR-013's table words them slightly differently ("3-minute continuous QWERTZ passage", "Formatted technical support ticket", "Cashier Rush math evaluation"). One of the two sources should be edited so they match before the labels reach a UI.
+
 ## Open questions
 
 None blocking. Please ratify (or veto) the three defaults most likely to matter later:
