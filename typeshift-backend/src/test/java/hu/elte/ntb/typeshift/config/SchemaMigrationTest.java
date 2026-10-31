@@ -40,6 +40,50 @@ class SchemaMigrationTest {
   }
 
   @Test
+  void stageSchemaMatchesStory13() throws IOException {
+    String sql = read("V5__stage_reference.sql");
+    assertThat(sql).contains("CREATE TABLE stage (");
+    assertThat(sql).contains("id BIGINT");
+    assertThat(sql).contains("INSERT INTO stage");
+    assertThat(sql).contains("Numpad and Math");
+    assertThat(sql).contains("Hungarian Accents");
+  }
+
+  @Test
+  void practiceSessionSchemaMatchesStory14() throws IOException {
+    String sql = read("V6__practice_session.sql");
+    assertThat(sql).contains("CREATE TABLE practice_session (");
+    assertThat(sql).contains("exercise_kind");
+    assertThat(sql).contains("CREATE INDEX idx_practice_session_user_submitted");
+  }
+
+  @Test
+  void scoreRecordSchemaMatchesStory15() throws IOException {
+    String sql = read("V7__score_record.sql");
+    assertThat(sql).contains("CREATE TABLE score_record (");
+    assertThat(sql).contains("attempt_kind");
+    assertThat(sql).contains("(attempt_kind = 'SUB_EXAM' AND sub_exam_number IS NOT NULL)");
+    assertThat(sql).contains("(attempt_kind = 'GRADUATION' AND sub_exam_number IS NULL)");
+  }
+
+  @Test
+  void weakKeySchemaMatchesStory16() throws IOException {
+    String sql = read("V8__weak_key_profile.sql");
+    assertThat(sql).contains("CREATE TABLE weak_key_profile (");
+    assertThat(sql).contains("PRIMARY KEY (user_id, key_char)");
+    assertThat(sql).contains("CREATE INDEX idx_weak_key_user_miss");
+  }
+
+  @Test
+  void graduationAttemptSchemaMatchesStory17() throws IOException {
+    String sql = read("V9__graduation_attempt.sql");
+    assertThat(sql).contains("CREATE TABLE graduation_attempt (");
+    assertThat(sql).contains("'IN_PROGRESS', 'PASSED', 'FAILED'");
+    assertThat(sql).contains("ADD COLUMN graduation_attempt_id");
+    assertThat(sql).contains("graduation_attempt_id IS NULL OR attempt_kind = 'GRADUATION'");
+  }
+
+  @Test
   void userAccountMapsAppUser() {
     assertThat(UserAccount.class.getAnnotation(Table.class).name()).isEqualTo("app_user");
   }
