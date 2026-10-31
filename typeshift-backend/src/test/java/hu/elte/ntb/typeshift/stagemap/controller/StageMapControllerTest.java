@@ -8,9 +8,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import hu.elte.ntb.typeshift.account.model.UserAccount;
 import hu.elte.ntb.typeshift.account.repository.UserAccountRepository;
 import hu.elte.ntb.typeshift.exercise.service.CannedCatalog;
+import hu.elte.ntb.typeshift.learning.model.LearningProfile;
+import hu.elte.ntb.typeshift.learning.repository.LearningProfileRepository;
 import hu.elte.ntb.typeshift.security.AuthCookie;
 import hu.elte.ntb.typeshift.security.JwtTokenService;
 import jakarta.servlet.http.Cookie;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +51,7 @@ class StageMapControllerTest {
   @Autowired UserAccountRepository users;
   @Autowired PasswordEncoder encoder;
   @Autowired JwtTokenService tokens;
+  @Autowired LearningProfileRepository profiles;
 
   private String cookieValue;
 
@@ -104,5 +109,36 @@ class StageMapControllerTest {
             stage ->
                 catalog.byStage(stage).stream()
                     .map(exercise -> Arguments.of(stage, exercise.examKey())));
+  }
+
+  @Test
+  void freshAccountShowsStageOneActiveAndRemainderLocked() throws Exception {
+    String username = "freshmap";
+    users.save(new UserAccount(username, encoder.encode(PASSWORD), username));
+    Cookie cookie = new Cookie(AuthCookie.NAME, tokens.issue(username));
+
+    mvc.perform(get("/stage-map").cookie(cookie))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("STAGE 01 OF 05 DEPLOYED")))
+        .andExpect(content().string(containsString("Active assignment")))
+        .andExpect(content().string(containsString("Locked — requires stage 1 clearance")));
+  }
+
+  @Test
+  void progressedAccountShowsStagesBeforeCurrentAsCertified() throws Exception {
+    String username = "progmap";
+    UserAccount account = users.save(new UserAccount(username, encoder.encode(PASSWORD), username));
+    LearningProfile profile = new LearningProfile(account);
+    profile.setCurrentStage(4);
+    profile.setUnlockedStages(new HashSet<>(Set.of(1, 2, 3, 4)));
+    profiles.save(profile);
+    Cookie cookie = new Cookie(AuthCookie.NAME, tokens.issue(username));
+
+    mvc.perform(get("/stage-map").cookie(cookie))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("STAGE 04 OF 05 DEPLOYED")))
+        .andExpect(content().string(containsString("Certified record")))
+        .andExpect(content().string(containsString("Active assignment")))
+        .andExpect(content().string(containsString("Locked — requires stage 4 clearance")));
   }
 }

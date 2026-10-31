@@ -18,7 +18,7 @@
         </div>
         <div class="docket" style="padding: var(--space-sm) var(--space-md)">
           <span class="label-caps" style="color: var(--muted)">Overall career standing</span>
-          <div class="metric-counter" style="color: var(--green)">STAGE 04 OF 05 DEPLOYED</div>
+          <div class="metric-counter" style="color: var(--green)" th:text="${stageLabel}">STAGE 04 OF 05 DEPLOYED</div>
         </div>
       </div>
       <div class="directive">
@@ -29,31 +29,38 @@
       <!-- Station cascade -->
       <div style="display:flex; flex-direction:column; gap: var(--space-lg)">
 
-        <!-- Station 1: QWERTZ Core — passed -->
-        <div class="stn">
+        <!-- Station 1: QWERTZ Core -->
+        <div class="stn" th:classappend="${currentStage == 1 ? 'active' : (currentStage &lt; 1 ? 'locked' : '')}">
           <div class="stn-head">
             <div class="id">
-              <span class="tag tag-ink">Station 01</span>
+              <span class="tag tag-ink" th:if="${currentStage != 1}">Station 01</span>
+              <span class="tag tag-brass" th:if="${currentStage == 1}">Current station 01</span>
               <span class="headline-md">QWERTZ Core</span>
               <span class="label-caps" style="color: var(--muted)">Grounding, swaps &amp; baseline</span>
             </div>
-            <span class="label-caps" style="color: var(--approved)">Certified record</span>
+            <span class="label-caps" style="color: var(--approved)" th:if="${currentStage > 1}">Certified record</span>
+            <span class="tag tag-brass" th:if="${currentStage == 1}">Active assignment</span>
           </div>
           <div class="stn-body">
             <div style="display:flex; flex-direction:column; gap: var(--space-md)">
-              <div class="stn-stats">
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Entry accuracy</span>
-                  <div class="metric-counter">98.4%</div></div>
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Typing rate</span>
-                  <div class="metric-counter">54 WPM</div></div>
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Audited datum</span>
-                  <div class="label-caps" style="color: var(--green)">24 Okt 1958</div></div>
+              <div th:if="${currentStage > 1}" style="display:flex; flex-direction:column; gap: var(--space-md)">
+                <div class="stn-stats">
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Entry accuracy</span>
+                    <div class="metric-counter">98.4%</div></div>
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Typing rate</span>
+                    <div class="metric-counter">54 WPM</div></div>
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Audited datum</span>
+                    <div class="label-caps" style="color: var(--green)">24 Okt 1958</div></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
+                  <span class="label-caps" style="color: var(--muted)">Syllabus milestones completed:</span>
+                  <span>✓ Home row grounding (<span class="mono">asdf jklé</span>)</span>
+                  <span>✓ Top row &amp; QWERTZ swap (<span class="mono">qwertzuiopőú</span>)</span>
+                  <span>✓ Bottom row baseline (<span class="mono">yxcvbnm,-.</span>)</span>
+                </div>
               </div>
-              <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
-                <span class="label-caps" style="color: var(--muted)">Syllabus milestones completed:</span>
-                <span>✓ Home row grounding (<span class="mono">asdf jklé</span>)</span>
-                <span>✓ Top row &amp; QWERTZ swap (<span class="mono">qwertzuiopőú</span>)</span>
-                <span>✓ Bottom row baseline (<span class="mono">yxcvbnm,-.</span>)</span>
+              <div th:if="${currentStage &lt;= 1}" class="docket" style="padding: var(--space-sm) var(--space-md)">
+                <span class="label-caps" style="color: var(--muted)">Record pending — complete this station to archive results.</span>
               </div>
               <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
                 <span class="label-caps" style="color: var(--muted)">Practice dockets:</span>
@@ -64,44 +71,69 @@
               </div>
               <div class="stn-grad">
                 <span class="label-caps">Graduation pass: 3-minute continuous QWERTZ passage</span>
-                <span class="label-caps" style="color: var(--green)">Passed [Rec: 01-992]</span>
+                <span class="label-caps" style="color: var(--green)" th:if="${currentStage > 1}">Passed [Rec: 01-992]</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage == 1}">Incomplete</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 1}">Restricted</span>
               </div>
             </div>
             <div style="display:flex; justify-content:center">
-              <div class="stamp-plate">
+              <div class="stamp-plate" th:if="${currentStage > 1}">
                 <span class="label-caps" style="color: var(--approved)">Dept. Typography</span>
                 <div class="big">Approved</div>
                 <span class="label-caps" style="color: var(--approved)">Record archived • 1958</span>
+              </div>
+              <div class="docket" th:if="${currentStage == 1}" style="display:flex; flex-direction:column; align-items:center; gap: var(--space-md); text-align:center">
+                <div>
+                  <span class="label-caps" style="color: var(--muted)">Bureau dispatch pending</span>
+                  <p style="margin: var(--space-xs) 0 0">Shift duty requires immediate session commencement on this station.</p>
+                </div>
+                <a class="btn btn-primary btn-block" th:href="@{/exercise/1/exam-1}">Start shift</a>
+              </div>
+              <div class="stamp-sealed stamp" th:if="${currentStage &lt; 1}">
+                <div class="label-caps">Access denied</div>
+                <div class="headline-md" style="margin: var(--space-xs) 0">Sealed</div>
+                <div class="label-caps">Complete previous station first</div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Station 2: Symbol Sorcerer — passed -->
-        <div class="stn">
+        <!-- Station 2: Symbol Sorcerer -->
+        <div class="stn" th:classappend="${currentStage == 2 ? 'active' : (currentStage &lt; 2 ? 'locked' : '')}">
           <div class="stn-head">
             <div class="id">
-              <span class="tag tag-ink">Station 02</span>
+              <span class="tag tag-ink" th:if="${currentStage != 2}">Station 02</span>
+              <span class="tag tag-brass" th:if="${currentStage == 2}">Current station 02</span>
               <span class="headline-md">Symbol Sorcerer</span>
               <span class="label-caps" style="color: var(--muted)">Punctuation, AltGr &amp; delimiters</span>
             </div>
-            <span class="label-caps" style="color: var(--approved)">Certified record</span>
+            <span class="label-caps" style="color: var(--approved)" th:if="${currentStage > 2}">Certified record</span>
+            <span class="tag tag-brass" th:if="${currentStage == 2}">Active assignment</span>
+            <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 2}">Locked — requires stage 1 clearance</span>
           </div>
           <div class="stn-body">
             <div style="display:flex; flex-direction:column; gap: var(--space-md)">
-              <div class="stn-stats">
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Entry accuracy</span>
-                  <div class="metric-counter">96.8%</div></div>
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Typing rate</span>
-                  <div class="metric-counter">48 WPM</div></div>
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Audited datum</span>
-                  <div class="label-caps" style="color: var(--green)">29 Okt 1958</div></div>
+              <div th:if="${currentStage > 2}" style="display:flex; flex-direction:column; gap: var(--space-md)">
+                <div class="stn-stats">
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Entry accuracy</span>
+                    <div class="metric-counter">96.8%</div></div>
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Typing rate</span>
+                    <div class="metric-counter">48 WPM</div></div>
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Audited datum</span>
+                    <div class="label-caps" style="color: var(--green)">29 Okt 1958</div></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
+                  <span class="label-caps" style="color: var(--muted)">Syllabus milestones completed:</span>
+                  <span>✓ Standard punctuation &amp; hyphenation</span>
+                  <span>✓ AltGr symbols &amp; brackets (<span class="mono">@, #, &amp;, {, }, []</span>)</span>
+                  <span>✓ Quotation marks &amp; dashes</span>
+                </div>
               </div>
-              <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
-                <span class="label-caps" style="color: var(--muted)">Syllabus milestones completed:</span>
-                <span>✓ Standard punctuation &amp; hyphenation</span>
-                <span>✓ AltGr symbols &amp; brackets (<span class="mono">@, #, &amp;, {, }, []</span>)</span>
-                <span>✓ Quotation marks &amp; dashes</span>
+              <div th:if="${currentStage == 2}" class="docket" style="padding: var(--space-sm) var(--space-md)">
+                <span class="label-caps" style="color: var(--muted)">Active assignment — record pending until graduation.</span>
+              </div>
+              <div th:if="${currentStage &lt; 2}" class="docket" style="padding: var(--space-sm) var(--space-md)">
+                <span class="label-caps" style="color: var(--muted)">Station sealed — complete stage 1 first.</span>
               </div>
               <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
                 <span class="label-caps" style="color: var(--muted)">Practice dockets:</span>
@@ -111,44 +143,69 @@
               </div>
               <div class="stn-grad">
                 <span class="label-caps">Graduation pass: Formatted technical support ticket</span>
-                <span class="label-caps" style="color: var(--green)">Passed [Rec: 02-311]</span>
+                <span class="label-caps" style="color: var(--green)" th:if="${currentStage > 2}">Passed [Rec: 02-311]</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage == 2}">Incomplete</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 2}">Restricted</span>
               </div>
             </div>
             <div style="display:flex; justify-content:center">
-              <div class="stamp-plate">
+              <div class="stamp-plate" th:if="${currentStage > 2}">
                 <span class="label-caps" style="color: var(--approved)">Special Standards</span>
                 <div class="big">Approved</div>
                 <span class="label-caps" style="color: var(--approved)">Clearance level II</span>
+              </div>
+              <div class="docket" th:if="${currentStage == 2}" style="display:flex; flex-direction:column; align-items:center; gap: var(--space-md); text-align:center">
+                <div>
+                  <span class="label-caps" style="color: var(--muted)">Bureau dispatch pending</span>
+                  <p style="margin: var(--space-xs) 0 0">Shift duty requires immediate session commencement on this station.</p>
+                </div>
+                <a class="btn btn-primary btn-block" th:href="@{/exercise/2/exam-1}">Start shift</a>
+              </div>
+              <div class="stamp-sealed stamp" th:if="${currentStage &lt; 2}">
+                <div class="label-caps">Access denied</div>
+                <div class="headline-md" style="margin: var(--space-xs) 0">Sealed</div>
+                <div class="label-caps">Complete stage 1 first</div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Station 3: Numpad & Math — passed, 100% compliance -->
-        <div class="stn">
+        <!-- Station 3: Numpad & Math -->
+        <div class="stn" th:classappend="${currentStage == 3 ? 'active' : (currentStage &lt; 3 ? 'locked' : '')}">
           <div class="stn-head">
             <div class="id">
-              <span class="tag tag-ink">Station 03</span>
+              <span class="tag tag-ink" th:if="${currentStage != 3}">Station 03</span>
+              <span class="tag tag-brass" th:if="${currentStage == 3}">Current station 03</span>
               <span class="headline-md">Numpad &amp; Math</span>
               <span class="label-caps" style="color: var(--muted)">10-key ledger arithmetic</span>
             </div>
-            <span class="tag tag-brass">100% zero-error compliance required</span>
+            <span class="label-caps" style="color: var(--approved)" th:if="${currentStage > 3}">Certified record</span>
+            <span class="tag tag-brass" th:if="${currentStage == 3}">Active assignment</span>
+            <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 3}">Locked — requires stage 2 clearance</span>
           </div>
           <div class="stn-body">
             <div style="display:flex; flex-direction:column; gap: var(--space-md)">
-              <div class="stn-stats">
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Tally accuracy</span>
-                  <div class="metric-counter" style="color: var(--green)">100.0%</div></div>
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Processing cadence</span>
-                  <div class="metric-counter">188 KPM</div></div>
-                <div class="cell"><span class="label-caps" style="color: var(--muted)">Ledger reconciled</span>
-                  <div class="label-caps" style="color: var(--green)">05 Nov 1958</div></div>
+              <div th:if="${currentStage > 3}" style="display:flex; flex-direction:column; gap: var(--space-md)">
+                <div class="stn-stats">
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Tally accuracy</span>
+                    <div class="metric-counter" style="color: var(--green)">100.0%</div></div>
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Processing cadence</span>
+                    <div class="metric-counter">188 KPM</div></div>
+                  <div class="cell"><span class="label-caps" style="color: var(--muted)">Ledger reconciled</span>
+                    <div class="label-caps" style="color: var(--green)">05 Nov 1958</div></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
+                  <span class="label-caps" style="color: var(--muted)">Syllabus milestones completed:</span>
+                  <span>✓ Numeric home row &amp; keypad orientation</span>
+                  <span>✓ Decimal point and transaction tallying</span>
+                  <span>✓ Ledger arithmetic &amp; balancing</span>
+                </div>
               </div>
-              <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
-                <span class="label-caps" style="color: var(--muted)">Syllabus milestones completed:</span>
-                <span>✓ Numeric home row &amp; keypad orientation</span>
-                <span>✓ Decimal point and transaction tallying</span>
-                <span>✓ Ledger arithmetic &amp; balancing</span>
+              <div th:if="${currentStage == 3}" class="docket" style="padding: var(--space-sm) var(--space-md)">
+                <span class="label-caps" style="color: var(--muted)">Active assignment — 100% zero-error compliance required.</span>
+              </div>
+              <div th:if="${currentStage &lt; 3}" class="docket" style="padding: var(--space-sm) var(--space-md)">
+                <span class="label-caps" style="color: var(--muted)">Station sealed — complete stage 2 first.</span>
               </div>
               <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
                 <span class="label-caps" style="color: var(--muted)">Practice dockets:</span>
@@ -158,32 +215,49 @@
               </div>
               <div class="stn-grad">
                 <span class="label-caps">Graduation pass: Cashier Rush math evaluation</span>
-                <span class="label-caps" style="color: var(--green)">Passed [Perfect ledger]</span>
+                <span class="label-caps" style="color: var(--green)" th:if="${currentStage > 3}">Passed [Perfect ledger]</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage == 3}">Incomplete</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 3}">Restricted</span>
               </div>
             </div>
             <div style="display:flex; justify-content:center">
-              <div class="stamp-plate">
+              <div class="stamp-plate" th:if="${currentStage > 3}">
                 <span class="label-caps" style="color: var(--approved)">Fiscal Controller</span>
                 <div class="big">Approved</div>
                 <span class="label-caps" style="color: var(--approved)">Perfect accuracy met</span>
+              </div>
+              <div class="docket" th:if="${currentStage == 3}" style="display:flex; flex-direction:column; align-items:center; gap: var(--space-md); text-align:center">
+                <div>
+                  <span class="label-caps" style="color: var(--muted)">Bureau dispatch pending</span>
+                  <p style="margin: var(--space-xs) 0 0">Shift duty requires immediate session commencement on this station.</p>
+                </div>
+                <a class="btn btn-primary btn-block" th:href="@{/exercise/3/exam-1}">Start shift</a>
+              </div>
+              <div class="stamp-sealed stamp" th:if="${currentStage &lt; 3}">
+                <div class="label-caps">Access denied</div>
+                <div class="headline-md" style="margin: var(--space-xs) 0">Sealed</div>
+                <div class="label-caps">Complete stage 2 first</div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Station 4: Hungarian Accents — active assignment -->
-        <div class="stn active">
+        <!-- Station 4: Hungarian Accents -->
+        <div class="stn" th:classappend="${currentStage == 4 ? 'active' : (currentStage &lt; 4 ? 'locked' : '')}">
           <div class="stn-head">
             <div class="id">
-              <span class="tag tag-brass">Current station 04</span>
+              <span class="tag tag-ink" th:if="${currentStage != 4}">Station 04</span>
+              <span class="tag tag-brass" th:if="${currentStage == 4}">Current station 04</span>
               <span class="headline-md">Hungarian Accents</span>
               <span class="mono" style="color: #baeed9">(á é í ó ö ő ú ü ű)</span>
             </div>
-            <span class="tag tag-brass">Active assignment</span>
+            <span class="label-caps" style="color: var(--approved)" th:if="${currentStage > 4}">Certified record</span>
+            <span class="tag tag-brass" th:if="${currentStage == 4}">Active assignment</span>
+            <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 4}">Locked — requires stage 3 clearance</span>
           </div>
           <div class="stn-body">
-            <div style="display:flex; flex-direction:column; gap: var(--space-lg)">
-              <div class="docket" style="display:flex; flex-direction:column; gap: var(--space-sm)">
+            <div style="display:flex; flex-direction:column; gap: var(--space-md)">
+              <div th:if="${currentStage == 4}" class="docket" style="display:flex; flex-direction:column; gap: var(--space-sm)">
                 <div class="label-caps" style="display:flex; justify-content:space-between">
                   <strong>Station progression index: 62%</strong>
                   <span style="color: var(--muted)">Benchmark requirement: 95.0% to certify</span>
@@ -198,29 +272,11 @@
                   <span>Completion</span>
                 </div>
               </div>
-              <div style="display:flex; flex-direction:column; gap: var(--space-sm)">
-                <span class="label-caps" style="color: var(--muted)">Active curricular checkpoints:</span>
-                <div class="chk">
-                  <span>✓</span>
-                  <div class="who">
-                    <span><strong>Short accents &amp; acute vowels</strong> (<span class="mono">á, é, í, ó, ú</span>)</span>
-                    <span class="label-caps" style="color: var(--green)">Passed (97.1%)</span>
-                  </div>
-                </div>
-                <div class="chk next">
-                  <span>→</span>
-                  <div class="who">
-                    <span><strong>Umlaut vs long umlaut precision</strong> (<span class="mono">ö/ő, ü/ű</span> differentiation)</span>
-                    <span class="label-caps" style="color: #5f4100">Next up</span>
-                  </div>
-                </div>
-                <div class="chk pending">
-                  <span>☐</span>
-                  <div class="who">
-                    <span>Mixed paragraph diacritic density</span>
-                    <span class="label-caps" style="color: var(--muted)">Pending</span>
-                  </div>
-                </div>
+              <div th:if="${currentStage > 4}" class="docket" style="padding: var(--space-sm) var(--space-md)">
+                <span class="label-caps" style="color: var(--muted)">Certified record — station archived.</span>
+              </div>
+              <div th:if="${currentStage &lt; 4}" class="docket" style="padding: var(--space-sm) var(--space-md)">
+                <span class="label-caps" style="color: var(--muted)">Station sealed — complete stage 3 first.</span>
               </div>
               <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
                 <span class="label-caps" style="color: var(--muted)">Practice dockets:</span>
@@ -230,38 +286,60 @@
               </div>
               <div class="stn-grad">
                 <span class="label-caps">Graduation pass: Formal Hungarian request letter</span>
-                <span class="label-caps" style="color: var(--muted)">Incomplete</span>
+                <span class="label-caps" style="color: var(--green)" th:if="${currentStage > 4}">Passed</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage == 4}">Incomplete</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 4}">Restricted</span>
               </div>
             </div>
-            <div class="docket" style="display:flex; flex-direction:column; align-items:center; gap: var(--space-md); text-align:center">
-              <div>
-                <span class="label-caps" style="color: var(--muted)">Bureau dispatch pending</span>
-                <p style="margin: var(--space-xs) 0 0">Shift duty requires immediate session commencement on vowel differentiation.</p>
+            <div style="display:flex; justify-content:center">
+              <div class="stamp-plate" th:if="${currentStage > 4}">
+                <span class="label-caps" style="color: var(--approved)">Dept. Typography</span>
+                <div class="big">Approved</div>
+                <span class="label-caps" style="color: var(--approved)">Record archived</span>
               </div>
-              <a class="btn btn-primary btn-block" th:href="@{/exercise}">Start shift</a>
-              <span class="label-caps" style="color: var(--muted)">Estimated drill time: 8 minutes</span>
+              <div class="docket" th:if="${currentStage == 4}" style="display:flex; flex-direction:column; align-items:center; gap: var(--space-md); text-align:center">
+                <div>
+                  <span class="label-caps" style="color: var(--muted)">Bureau dispatch pending</span>
+                  <p style="margin: var(--space-xs) 0 0">Shift duty requires immediate session commencement on vowel differentiation.</p>
+                </div>
+                <a class="btn btn-primary btn-block" th:href="@{/exercise/4/exam-1}">Start shift</a>
+                <span class="label-caps" style="color: var(--muted)">Estimated drill time: 8 minutes</span>
+              </div>
+              <div class="stamp-sealed stamp" th:if="${currentStage &lt; 4}">
+                <div class="label-caps">Access denied</div>
+                <div class="headline-md" style="margin: var(--space-xs) 0">Sealed</div>
+                <div class="label-caps">Complete stage 3 first</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Station 5: Real-World Tasks — locked -->
-        <div class="stn locked">
+        <!-- Station 5: Real-World Tasks -->
+        <div class="stn" th:classappend="${currentStage == 5 ? 'active' : (currentStage &lt; 5 ? 'locked' : '')}">
           <div class="stn-head">
             <div class="id">
-              <span class="tag">Station 05</span>
+              <span class="tag tag-ink" th:if="${currentStage != 5}">Station 05</span>
+              <span class="tag tag-brass" th:if="${currentStage == 5}">Current station 05</span>
               <span class="headline-md" style="color: var(--muted)">Real-World Tasks</span>
               <span class="label-caps" style="color: var(--muted)">Pragmatic bureau dispatches</span>
             </div>
-            <span class="label-caps" style="color: var(--muted)">Locked — requires stage 4 clearance</span>
+            <span class="label-caps" style="color: var(--approved)" th:if="${currentStage > 5}">Certified record</span>
+            <span class="tag tag-brass" th:if="${currentStage == 5}">Active assignment</span>
+            <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 5}">Locked — requires stage 4 clearance</span>
           </div>
           <div class="stn-body">
             <div style="display:flex; flex-direction:column; gap: var(--space-md)">
-              <span class="label-caps" style="color: var(--muted)">Dockets pending unlocking:</span>
-              <div style="display:flex; flex-direction:column; gap: var(--space-xs); color: var(--muted)">
-                <span>🔒 Informal bureau chat dispatch</span>
-                <span>🔒 Inter-departmental memorandum / email</span>
-                <span>🔒 Official petition &amp; business dossier</span>
-                <span>🔒 System technical code annotation</span>
+              <div th:if="${currentStage == 5}" class="docket" style="padding: var(--space-sm) var(--space-md)">
+                <span class="label-caps" style="color: var(--muted)">Active assignment — pragmatic bureau dispatches.</span>
+              </div>
+              <div th:if="${currentStage &lt; 5}">
+                <span class="label-caps" style="color: var(--muted)">Dockets pending unlocking:</span>
+                <div style="display:flex; flex-direction:column; gap: var(--space-xs); color: var(--muted)">
+                  <span>🔒 Informal bureau chat dispatch</span>
+                  <span>🔒 Inter-departmental memorandum / email</span>
+                  <span>🔒 Official petition &amp; business dossier</span>
+                  <span>🔒 System technical code annotation</span>
+                </div>
               </div>
               <div style="display:flex; flex-direction:column; gap: var(--space-xs)">
                 <span class="label-caps" style="color: var(--muted)">Practice dockets:</span>
@@ -273,11 +351,25 @@
               </div>
               <div class="stn-grad">
                 <span class="label-caps">Graduation pass: Three random tasks in sequence</span>
-                <span class="label-caps" style="color: var(--muted)">Restricted</span>
+                <span class="label-caps" style="color: var(--green)" th:if="${currentStage > 5}">Passed</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage == 5}">Incomplete</span>
+                <span class="label-caps" style="color: var(--muted)" th:if="${currentStage &lt; 5}">Restricted</span>
               </div>
             </div>
             <div style="display:flex; justify-content:center">
-              <div class="stamp-sealed stamp">
+              <div class="stamp-plate" th:if="${currentStage > 5}">
+                <span class="label-caps" style="color: var(--approved)">Dept. Typography</span>
+                <div class="big">Approved</div>
+                <span class="label-caps" style="color: var(--approved)">Record archived</span>
+              </div>
+              <div class="docket" th:if="${currentStage == 5}" style="display:flex; flex-direction:column; align-items:center; gap: var(--space-md); text-align:center">
+                <div>
+                  <span class="label-caps" style="color: var(--muted)">Bureau dispatch pending</span>
+                  <p style="margin: var(--space-xs) 0 0">Shift duty requires immediate session commencement on this station.</p>
+                </div>
+                <a class="btn btn-primary btn-block" th:href="@{/exercise/5/exam-1}">Start shift</a>
+              </div>
+              <div class="stamp-sealed stamp" th:if="${currentStage &lt; 5}">
                 <div class="label-caps">Access denied</div>
                 <div class="headline-md" style="margin: var(--space-xs) 0">Sealed</div>
                 <div class="label-caps">Complete stage 4 first</div>
