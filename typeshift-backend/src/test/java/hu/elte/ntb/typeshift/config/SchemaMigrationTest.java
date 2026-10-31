@@ -31,6 +31,15 @@ class SchemaMigrationTest {
   }
 
   @Test
+  void learningProfileSchemaMatchesStory12() throws IOException {
+    String sql = read("V4__learning_profile_schema.sql");
+    assertThat(sql).contains("ALTER TABLE learning_profiles RENAME TO learning_profile");
+    assertThat(sql).contains("ADD COLUMN keyboard_layout");
+    assertThat(sql).contains("CHECK (current_stage BETWEEN 1 AND 5)");
+    assertThat(sql).contains("CREATE UNIQUE INDEX");
+  }
+
+  @Test
   void userAccountMapsAppUser() {
     assertThat(UserAccount.class.getAnnotation(Table.class).name()).isEqualTo("app_user");
   }

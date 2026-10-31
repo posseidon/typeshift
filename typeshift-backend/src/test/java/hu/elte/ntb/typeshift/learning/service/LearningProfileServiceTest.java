@@ -35,5 +35,6 @@ class LearningProfileServiceTest {
     assertEquals(0, profile.getTotalPracticeMinutes());
     assertNull(profile.getProgramStartDate());
     assertTrue(profile.getUnlockedStages().contains(1));
+    assertEquals("HU_QWERTZ", profile.getKeyboardLayout());
   }
 }
