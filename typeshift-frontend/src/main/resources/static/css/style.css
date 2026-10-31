@@ -729,6 +729,44 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
   margin: 0;
 }
 
+/* ---- Task-type display variants (Stage 5) ----------------------------- */
+
+/* Chat burst: the whole block carries one uniform indent and tint, so every
+   authored "- <name>: ..." line reads as a message and wrapped continuations
+   stay clearly part of their line. No bubble markup, engine untouched. */
+.docket--chat-burst #prose-display {
+  font-family: var(--font-ui);
+  font-size: 1.15rem;
+  line-height: 2;
+  letter-spacing: 0;
+  background: var(--paper-dim);
+  padding: var(--space-md) var(--space-md) var(--space-md) calc(var(--space-md) + 1.5em);
+}
+
+/* Email reply: a pasted-in sheet behind a brass margin rule. The header line
+   (Tárgy: ...) is authored content, not parsed. */
+.docket--email-reply #prose-display {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  line-height: 2;
+  letter-spacing: 0;
+  background: var(--paper);
+  border-left: 4px solid var(--brass);
+  padding: var(--space-md) var(--space-lg);
+}
+
+/* Document paragraph: a narrow read-measure sheet, like one clause lifted out
+   of a contract. Graduation (taskClass null) keeps the wide baseline. */
+.docket--document-paragraph #prose-display { max-width: 65ch; }
+
+/* Code comment: monospace lines on a tinted sheet; wrapping untouched. The
+   "//" prefixes are authored content, not markup. */
+.docket--code-comment #prose-display {
+  font-family: var(--font-mono);
+  background: var(--paper-dim);
+  padding: var(--space-md);
+}
+
 .ch-ok { color: var(--ink); }
 
 .ch-bad {
@@ -758,6 +796,59 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
   height: 4px;
   opacity: 0;
   pointer-events: none;
+}
+
+/* ---- Numpad capture (Stage 3, ADR-006) ------------------------------- */
+
+.pad-block { display: flex; flex-direction: column; gap: var(--space-md); }
+
+.pad-value {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  min-height: 3rem;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 2px solid var(--ink);
+  background: var(--card);
+}
+
+.pad-value:empty::after { content: "—"; color: var(--muted); }
+
+#math-verdict {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--hairline);
+}
+
+#math-verdict.verdict-ok { color: var(--green); border-color: var(--green); background: var(--card); }
+
+#math-verdict.verdict-bad { color: var(--red); border-color: var(--red); background: var(--red-tint); }
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-sm);
+  max-width: 34rem;
+}
+
+.keypad button {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  box-shadow: 1px 1px 0 var(--hairline);
+  padding: var(--space-sm) 0;
+  cursor: pointer;
+}
+
+.keypad button:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+  background: var(--paper-dim);
 }
 
 .kbd {
