@@ -75,6 +75,7 @@ class ProseExerciseControllerTest {
         .andExpect(content().string(containsString("data-target=\"A hivatalos iratokat")))
         .andExpect(content().string(containsString("data-mode=\"prose\"")))
         .andExpect(content().string(not(containsString("data-expected"))))
+        .andExpect(content().string(containsString("<textarea id=\"practice-input\"")))
         .andExpect(content().string(containsString("New copy")));
     mvc.perform(get("/exercise/2/grad").cookie(session()))
         .andExpect(status().isOk())
