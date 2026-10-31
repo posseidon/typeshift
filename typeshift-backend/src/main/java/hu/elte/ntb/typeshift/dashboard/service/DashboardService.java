@@ -141,8 +141,7 @@ public class DashboardService {
     Set<Long> graduatedStages =
         new HashSet<>(
             jdbc.query(
-                "SELECT DISTINCT stage_id FROM score_record WHERE user_id = ? "
-                    + "AND attempt_kind = 'GRADUATION' AND passed = TRUE",
+                "SELECT DISTINCT stage_id FROM graduation_attempt WHERE user_id = ? AND passed = TRUE",
                 (rs, rowNum) -> rs.getLong("stage_id"),
                 userId));
     return jdbc.query(

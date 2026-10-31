@@ -76,6 +76,7 @@ class DashboardControllerTest {
             "<span class=\"metric-counter\">0</span>",
             "QWERTZ Core")
         .doesNotContain(
+            "0.0%",
             "68",
             "97.4%",
             "142",
@@ -93,14 +94,18 @@ class DashboardControllerTest {
 
   @Test
   void dashboardShowsOnlyCurrentOwnersPersistedMetricsAndRows() throws Exception {
-    insertProfile(ownerId, 2, 27, List.of(1, 2));
-    for (int index = 1; index <= 8; index++) {
-      insertSession(index, ownerId, 2, 40 + index, timestamp(index));
+    insertProfile(1, otherId, 5, 99, List.of(1, 2, 3, 4, 5));
+    insertProfile(100, ownerId, 2, 27, List.of(1, 2));
+    int[] daysBySessionId = {8, 2, 7, 1, 6, 3, 5, 4};
+    for (int index = 1; index <= daysBySessionId.length; index++) {
+      insertSession(index, ownerId, 2, 40 + index, timestamp(daysBySessionId[index - 1]));
     }
     insertScore(1, ownerId, 2, "SUB_EXAM", 1, "0.9740", true, timestamp(2), null);
     insertScore(2, ownerId, 2, "SUB_EXAM", 2, "0.9000", false, timestamp(3), null);
     insertSession(20, otherId, 5, 211.25, timestamp(9));
     insertScore(20, otherId, 5, "SUB_EXAM", 1, "0.3330", false, timestamp(9), null);
+    insertGraduationAttempt(10, otherId, 5, true);
+    insertScore(21, otherId, 5, "GRADUATION", null, "0.9800", true, timestamp(9), 10L);
     jdbc.update(
         "INSERT INTO weak_key_profile (user_id, key_char, miss_count, updated_at) VALUES (?, ?, ?, ?)",
         ownerId,
@@ -119,7 +124,7 @@ class DashboardControllerTest {
     org.assertj.core.api.Assertions.assertThat(body)
         .contains(
             "Dashboard Owner",
-            "48.00",
+            "41.00",
             "8 sessions",
             "93.7%",
             "1 / 2",
@@ -127,13 +132,15 @@ class DashboardControllerTest {
             "12",
             "Sub-exam 1",
             "97.4%",
-            "Sub-exam 2",
-            "42.00")
+            "Sub-exam 2")
         .doesNotContain("211.25", "33.3%", "XQ", "82123");
+    org.assertj.core.api.Assertions.assertThat(stageStatus(body, "02")).isEqualTo("CURRENT");
+    org.assertj.core.api.Assertions.assertThat(stageStatus(body, "05")).isEqualTo("LOCKED");
+    org.assertj.core.api.Assertions.assertThat(occurrences(body, "GRADUATED")).isZero();
     org.assertj.core.api.Assertions.assertThat(occurrences(body, "data-wpm-point")).isEqualTo(7);
-    org.assertj.core.api.Assertions.assertThat(body.lastIndexOf("42.00"))
-        .isLessThan(body.lastIndexOf("48.00"));
-    org.assertj.core.api.Assertions.assertThat(body).doesNotContain("41.00");
+    org.assertj.core.api.Assertions.assertThat(body)
+        .containsSubsequence("42.00", "46.00", "48.00", "47.00", "45.00", "43.00", "41.00")
+        .doesNotContain("44.00");
   }
 
   @Test
@@ -157,9 +164,12 @@ class DashboardControllerTest {
         true);
     insertScore(3, ownerId, 1, "GRADUATION", null, "0.9800", true, timestamp(2), 1L);
 
+    insertGraduationAttempt(2, ownerId, 5, false);
+    insertScore(4, ownerId, 5, "GRADUATION", null, "0.9800", true, timestamp(4), 2L);
     String afterPass = page().andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     org.assertj.core.api.Assertions.assertThat(occurrences(afterPass, "GRADUATED")).isEqualTo(1);
     org.assertj.core.api.Assertions.assertThat(afterPass).contains("QWERTZ Core", "GRADUATED");
+    org.assertj.core.api.Assertions.assertThat(stageStatus(afterPass, "05")).isEqualTo("LOCKED");
   }
 
   @Test
@@ -227,11 +237,16 @@ class DashboardControllerTest {
   }
 
   private void insertProfile(long userId, int currentStage, int minutes, List<Integer> unlocked) {
+    insertProfile(userId, userId, currentStage, minutes, unlocked);
+  }
+
+  private void insertProfile(
+      long profileId, long userId, int currentStage, int minutes, List<Integer> unlocked) {
     jdbc.update(
         "INSERT INTO learning_profile "
             + "(id, user_id, current_stage, total_practice_minutes, keyboard_layout, updated_at) "
             + "VALUES (?, ?, ?, ?, ?, ?)",
-        userId,
+        profileId,
         userId,
         currentStage,
         minutes,
@@ -240,9 +255,23 @@ class DashboardControllerTest {
     for (int stage : unlocked) {
       jdbc.update(
           "INSERT INTO learning_profile_unlocked_stages (learning_profile_id, stage) VALUES (?, ?)",
-          userId,
+          profileId,
           stage);
     }
+  }
+
+  private void insertGraduationAttempt(long id, long userId, int stageId, boolean passed) {
+    String status = passed ? "PASSED" : "FAILED";
+    jdbc.update(
+        "INSERT INTO graduation_attempt (id, user_id, stage_id, status, started_at, finished_at, passed) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        id,
+        userId,
+        stageId,
+        status,
+        timestamp(1),
+        timestamp(2),
+        passed);
   }
 
   private void insertSession(long id, long userId, int stageId, double wpm, String submittedAt) {
@@ -288,5 +317,12 @@ class DashboardControllerTest {
 
   private int occurrences(String text, String fragment) {
     return text.split(fragment, -1).length - 1;
+  }
+
+  private String stageStatus(String page, String stageNumber) {
+    int stageStart = page.indexOf("STAGE <span>" + stageNumber + "</span>");
+    int statusStart = page.indexOf("<span class=\"stamp\">", stageStart);
+    int statusEnd = page.indexOf("</span>", statusStart);
+    return page.substring(statusStart + "<span class=\"stamp\">".length(), statusEnd);
   }
 }
