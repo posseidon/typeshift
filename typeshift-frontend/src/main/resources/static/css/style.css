@@ -731,8 +731,9 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
 
 /* ---- Task-type display variants (Stage 5) ----------------------------- */
 
-/* Chat burst: hanging indent gives authored lines chat rhythm; the tint is the
-   block itself — no bubble markup, the char engine stays untouched. */
+/* Chat burst: the whole block carries one uniform indent and tint, so every
+   authored "- <name>: ..." line reads as a message and wrapped continuations
+   stay clearly part of their line. No bubble markup, engine untouched. */
 .docket--chat-burst #prose-display {
   font-family: var(--font-ui);
   font-size: 1.15rem;
@@ -740,7 +741,6 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
   letter-spacing: 0;
   background: var(--paper-dim);
   padding: var(--space-md) var(--space-md) var(--space-md) calc(var(--space-md) + 1.5em);
-  text-indent: -1.5em;
 }
 
 /* Email reply: a pasted-in sheet behind a brass margin rule. The header line

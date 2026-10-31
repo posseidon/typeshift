@@ -105,14 +105,17 @@ public class CannedCatalog {
               + "hosszabbítsák meg. Tisztelettel: Nagy Éva",
           180),
       prose(5, ExamType.SUB_EXAM, "exam-1", "Chat burst", TaskType.CHAT_BURST,
-          "Szia Anna! Megjött a csomag? – Igen, délelőtt átvettem a recepción. – Szuper, "
-              + "köszönöm! – A számlát beszkenneltem, és elküldtem e-mailben. – Rendben, "
-              + "holnap átnézem, és szólok, ha kérdés merül fel. – Oké, addig is szép napot!",
+          "- Anna: Megjött a nyilvántartási kivonat, átnézed még ma?\n"
+              + "- Bence: Igen, délután háromig mindenképp végzek vele.\n"
+              + "- Anna: Köszi! A hiányzó mellékletet is pótoltam közben.\n"
+              + "- Bence: Szuper, akkor holnap reggel leadom az iktatóban.",
           45),
       prose(5, ExamType.SUB_EXAM, "exam-2", "Email reply", TaskType.EMAIL_REPLY,
-          "Kedves Kolléga! Köszönöm a gyors visszajelzést. A jelentkezési lapot átnéztem, "
-              + "két adat hiányzik: az adószám és a számlázási cím. Kérlek, pótold péntekig, "
-              + "hogy a szerződést jövő héten aláírhassuk. Ha kérdésed van, hívj nyugodtan. "
+          "Tárgy: Jelentkezési lap hiánypótlása\n"
+              + "Kedves Kolléga!\n"
+              + "Köszönöm a gyors visszajelzést, a jelentkezési lapot átnéztem.\n"
+              + "Két adat hiányzik: az adószám és a számlázási cím.\n"
+              + "Kérlek, pótold péntekig, hogy a szerződést jövő héten aláírhassuk.\n"
               + "Üdvözlettel: Kovács Anna",
           45),
       prose(5, ExamType.SUB_EXAM, "exam-3", "Document paragraph", TaskType.DOCUMENT_PARAGRAPH,
