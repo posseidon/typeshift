@@ -729,6 +729,43 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
   margin: 0;
 }
 
+/* ---- Task-type display variants (Stage 5) ----------------------------- */
+
+/* Chat burst: hanging indent gives authored lines chat rhythm; the tint is the
+   block itself — no bubble markup, the char engine stays untouched. */
+.docket--chat-burst #prose-display {
+  font-family: var(--font-ui);
+  font-size: 1.15rem;
+  line-height: 2;
+  letter-spacing: 0;
+  background: var(--paper-dim);
+  padding: var(--space-md) var(--space-md) var(--space-md) calc(var(--space-md) + 1.5em);
+  text-indent: -1.5em;
+}
+
+/* Email reply: a pasted-in sheet behind a brass margin rule. The header line
+   (Tárgy: ...) is authored content, not parsed. */
+.docket--email-reply #prose-display {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  line-height: 2;
+  letter-spacing: 0;
+  background: var(--paper);
+  border-left: 4px solid var(--brass);
+  padding: var(--space-md) var(--space-lg);
+}
+
+/* Document paragraph stays the plain wide-measure baseline, so graduation
+   (taskClass null, no variant class) renders identically. */
+
+/* Code comment: monospace lines on a tinted sheet; wrapping untouched. The
+   "//" prefixes are authored content, not markup. */
+.docket--code-comment #prose-display {
+  font-family: var(--font-mono);
+  background: var(--paper-dim);
+  padding: var(--space-md);
+}
+
 .ch-ok { color: var(--ink); }
 
 .ch-bad {
