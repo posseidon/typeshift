@@ -32,7 +32,7 @@
             </div>
           </div>
         </div>
-        <div class="shift-state label-caps">Shift in progress // Stage 4: Accents [HU]</div>
+        <div class="shift-state label-caps" th:text="${shiftState}">Shift in progress // Stage 4: Accents [HU]</div>
       </div>
     </aside>
 
@@ -52,24 +52,68 @@
                 onclick="document.getElementById('keyboard-banner').style.display='none'">×</button>
       </div>
 
+      <!-- Standard notice 15-NU: keypad lock reminder, numeric dockets only (ADR-006) -->
+      <div class="notice" id="numlock-banner" th:if="${dataMode == 'numeric'}">
+        <div style="display:flex; gap: var(--space-sm); align-items:flex-start">
+          <span aria-hidden="true">▣</span>
+          <div>
+            <span class="label-caps"><strong>Standard notice 15-NU:</strong></span>
+            <span> Please confirm the <strong>NumLock</strong> state before tallying. Keypad digits
+              arrive keyed by physical key position regardless of NumLock, so be deliberate when
+              typing numbers.</span>
+          </div>
+        </div>
+        <button class="close" type="button" aria-label="Dismiss notice"
+                onclick="document.getElementById('numlock-banner').style.display='none'">×</button>
+      </div>
+
       <!-- Main exercise docket -->
-      <div class="docket type-card">
+      <div id="typing-docket" class="docket type-card"
+           th:attr="data-target=${dataTarget},data-mode=${dataMode},data-expected=${dataExpected}"
+           th:classappend="${taskClass != null ? ' docket--' + taskClass : ''}">
         <div class="docket-head">
           <div style="display:flex; gap: var(--space-sm); flex-wrap:wrap; align-items:center">
-            <span class="label-caps"><strong>Docket assignment no. 408-B</strong></span>
-            <span class="label-caps" style="color: var(--muted)">Hungarian prose transcribing [civil service record]</span>
+            <span class="label-caps"><strong th:text="${docketLabel}">Docket assignment no. 408-B</strong></span>
+            <span class="label-caps" style="color: var(--muted)" th:text="${docketFraming}">Hungarian prose transcribing [civil service record]</span>
           </div>
+          <button class="btn btn-ghost" type="button" onclick="window.location.reload()">New copy</button>
           <span class="tag tag-green">Classified active</span>
         </div>
-        <div id="typing-container" onclick="document.getElementById('practice-input').focus()">
-          <p class="type-pane" id="prose-display" aria-live="off"></p>
-          <input id="practice-input" aria-label="Type transcription here" type="text"
-                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div id="typing-container">
+          <p class="type-pane" id="prose-display" aria-live="off" style="white-space: pre-line"
+             th:text="${dataMode == 'numeric' ? dataTarget : ''}"></p>
+          <div class="pad-block" th:if="${dataMode == 'numeric'}">
+            <div id="practice-pad" class="pad-value" contenteditable="false" aria-live="polite"></div>
+            <div id="math-verdict" role="status" hidden></div>
+            <!-- Keypad dispatches typepad CustomEvents; the engine owns capture (ADR-006). -->
+            <div id="keypad" class="keypad">
+              <button type="button" data-code="Numpad7">7</button>
+              <button type="button" data-code="Numpad8">8</button>
+              <button type="button" data-code="Numpad9">9</button>
+              <button type="button" data-code="NumpadDivide">÷</button>
+              <button type="button" data-code="NumpadMultiply">×</button>
+              <button type="button" data-code="Numpad4">4</button>
+              <button type="button" data-code="Numpad5">5</button>
+              <button type="button" data-code="Numpad6">6</button>
+              <button type="button" data-code="NumpadSubtract">−</button>
+              <button type="button" data-code="NumpadAdd">+</button>
+              <button type="button" data-code="Numpad1">1</button>
+              <button type="button" data-code="Numpad2">2</button>
+              <button type="button" data-code="Numpad3">3</button>
+              <button type="button" data-code="NumpadDecimal">,</button>
+              <button type="button" data-code="NumpadEnter">⏎</button>
+              <button type="button" data-code="Numpad0">0</button>
+            </div>
+          </div>
+          <textarea th:unless="${dataMode == 'numeric'}" id="practice-input"
+                    aria-label="Type transcription here"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
         </div>
         <div class="docket-foot label-caps">
           <div style="display:flex; gap: var(--space-md); flex-wrap:wrap">
             <span>Batch: SEC-04 // Paragraph 1 of 3</span>
-            <span>Key retries: <span id="retry-count">00</span></span>
+            <span><span th:text="${dataMode == 'numeric' ? 'Missed / Hiányszám' : 'Key retries'}">Key retries</span>:
+              <span id="retry-count">00</span></span>
             <span>Gross characters: <span id="gross-count">0</span></span>
           </div>
           <span>Carriage feed: mechanical lock enabled</span>
