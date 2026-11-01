@@ -3,6 +3,8 @@ package hu.elte.ntb.typeshift.exercise.controller;
 import hu.elte.ntb.typeshift.ai.model.ExamType;
 import hu.elte.ntb.typeshift.exercise.model.CannedExercise;
 import hu.elte.ntb.typeshift.exercise.service.CannedCatalog;
+import hu.elte.ntb.typeshift.exercise.service.ExerciseSubmissionService;
+import java.security.Principal;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -41,9 +45,11 @@ public class ProseExerciseController {
       Map.entry("5/grad", "three-task sequence run"));
 
   private final CannedCatalog catalog;
+  private final ExerciseSubmissionService submissions;
 
-  public ProseExerciseController(CannedCatalog catalog) {
+  public ProseExerciseController(CannedCatalog catalog, ExerciseSubmissionService submissions) {
     this.catalog = catalog;
+    this.submissions = submissions;
   }
 
   /**
@@ -80,7 +86,30 @@ public class ProseExerciseController {
     model.addAttribute("dataExpected", exercise.isMath() ? exercise.expectedAnswer() : null);
     model.addAttribute("dataMode", exercise.isMath() ? "numeric" : "prose");
     model.addAttribute("taskClass", taskClass(exercise));
+    model.addAttribute("stageId", stageId);
+    model.addAttribute("examKey", examKey);
     return "layout";
+  }
+
+  /**
+   * Saves the measured result of one completed exercise before returning to the dashboard.
+   *
+   * @param stageId station identifier
+   * @param examKey catalog key within the station
+   * @param typedText final text entered by the learner
+   * @param elapsedSeconds elapsed typing time in seconds
+   * @param principal authenticated learner
+   * @return redirect to the saved-results dashboard
+   */
+  @PostMapping("/exercise/{stageId}/{examKey}/submit")
+  public String submit(
+      @PathVariable int stageId,
+      @PathVariable String examKey,
+      @RequestParam String typedText,
+      @RequestParam int elapsedSeconds,
+      Principal principal) {
+    submissions.submit(principal.getName(), stageId, examKey, typedText, elapsedSeconds);
+    return "redirect:/";
   }
 
   private static String shiftState(CannedExercise exercise) {

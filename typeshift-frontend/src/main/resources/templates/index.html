@@ -85,18 +85,29 @@
         <div class="docket">
           <div class="docket-head">
             <div>
-              <span class="label-caps" style="color: var(--green)">PRACTICE HISTORY</span>
-              <h2 class="headline-md">WPM history</h2>
+              <span class="label-caps" style="color: var(--green)">SCORE RECORDS</span>
+              <h2 class="headline-md">Recent attempts</h2>
             </div>
           </div>
-          <div class="chart-wrap" id="wpm-history">
-            <p class="label-caps" th:if="${#lists.isEmpty(dashboard.wpmHistory)}">No WPM history yet</p>
-            <div class="stations" th:unless="${#lists.isEmpty(dashboard.wpmHistory)}">
-              <div class="station" data-wpm-point th:each="point : ${dashboard.wpmHistory}">
-                <span class="label-caps" style="color: var(--muted)" th:text="${point.submittedAt}">Submitted at</span>
-                <span class="metric-counter" th:text="${#numbers.formatDecimal(point.wpm, 1, 2)}">0</span>
-              </div>
-            </div>
+          <p class="label-caps" th:if="${#lists.isEmpty(dashboard.recentScores)}">No score attempts yet</p>
+          <div class="ledger-wrap" th:unless="${#lists.isEmpty(dashboard.recentScores)}">
+            <table class="ledger">
+              <thead>
+                <tr>
+                  <th>Date</th><th>Stage</th><th>Attempt</th><th class="num">Accuracy</th>
+                  <th style="text-align:center">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="score : ${dashboard.recentScores}">
+                  <td class="label-caps" style="color: var(--muted)" th:text="${score.submittedAt}">Submitted at</td>
+                  <td class="label-caps" th:text="${score.stageName}">Stage</td>
+                  <td th:text="${score.examLabel}">Sub-exam 1</td>
+                  <td class="num" th:text="${score.accuracyPercent} + '%'">0%</td>
+                  <td style="text-align:center" th:text="${score.passed} ? 'Passed' : 'Not passed'">Not passed</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -123,50 +134,6 @@
         </div>
       </div>
 
-      <div class="docket">
-        <div class="docket-head">
-          <div>
-            <span class="label-caps" style="color: var(--green)">PERSISTED MISS COUNTS</span>
-            <h2 class="headline-md">Weak keys</h2>
-          </div>
-        </div>
-        <p class="label-caps" th:if="${#lists.isEmpty(dashboard.weakKeys)}">No weak-key data yet</p>
-        <div class="stations" th:unless="${#lists.isEmpty(dashboard.weakKeys)}">
-          <div class="station" th:each="weakKey : ${dashboard.weakKeys}">
-            <span class="name" th:text="${weakKey.keyChar}">Key</span>
-            <span class="label-caps" th:text="${weakKey.missCount} + ' misses'">0 misses</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="docket">
-        <div class="docket-head">
-          <div>
-            <span class="label-caps" style="color: var(--green)">SCORE RECORDS</span>
-            <h2 class="headline-md">Recent attempts</h2>
-          </div>
-        </div>
-        <p class="label-caps" th:if="${#lists.isEmpty(dashboard.recentScores)}">No score attempts yet</p>
-        <div class="ledger-wrap" th:unless="${#lists.isEmpty(dashboard.recentScores)}">
-          <table class="ledger">
-            <thead>
-              <tr>
-                <th>Date</th><th>Stage</th><th>Attempt</th><th class="num">Accuracy</th>
-                <th style="text-align:center">Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="score : ${dashboard.recentScores}">
-                <td class="label-caps" style="color: var(--muted)" th:text="${score.submittedAt}">Submitted at</td>
-                <td class="label-caps" th:text="${score.stageName}">Stage</td>
-                <td th:text="${score.examLabel}">Sub-exam 1</td>
-                <td class="num" th:text="${score.accuracyPercent} + '%'">0%</td>
-                <td style="text-align:center" th:text="${score.passed} ? 'Passed' : 'Not passed'">Not passed</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   </section>
 </body>

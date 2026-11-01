@@ -123,6 +123,12 @@
       <!-- Terminal control footer -->
       <div class="controls-row">
         <a class="btn btn-ghost" th:href="@{/stage-map}">Abandon shift</a>
+        <form id="exercise-submission" method="post"
+              th:action="@{/exercise/{stageId}/{examKey}/submit(stageId=${stageId},examKey=${examKey})}">
+          <input id="submitted-text" name="typedText" type="hidden">
+          <input id="elapsed-seconds" name="elapsedSeconds" type="hidden">
+          <button id="submit-result" class="btn" type="submit" disabled>Save result</button>
+        </form>
         <div class="key-hints label-caps">
           <span><span class="kbd">ESC</span> Pause / abandon</span>
           <span><span class="kbd">TAB</span> Restart docket</span>

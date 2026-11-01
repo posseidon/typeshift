@@ -96,6 +96,17 @@ public class UserAccountService {
   }
 
   /**
+   * Finds the database identifier of the authenticated account.
+   *
+   * @param username the authenticated login name
+   * @return the account identifier
+   */
+  @Transactional(readOnly = true)
+  public long accountIdFor(String username) {
+    return requireAccount(username).getId();
+  }
+
+  /**
    * Replaces the display name when a non-blank value is submitted; blank
    * means "keep the current one".
    *

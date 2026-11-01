@@ -9,8 +9,7 @@
       <div class="docket auth-card">
         <div class="punch-strip"></div>
         <div class="inner">
-          <h1 class="headline-xl">Start your shift</h1>
-          <p class="auth-sub label-caps">Bureau of Accredited Typists • Punch Clock Station</p>
+          <h1 class="headline-xl">Start here!</h1>
           <p th:if="${error}" class="error label-caps" role="alert"
              th:text="${errorText} ?: 'Invalid username or password.'">Invalid username or password.</p>
           <form class="stack" th:action="@{/login}" method="post">

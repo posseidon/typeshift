@@ -1,8 +1,10 @@
 package hu.elte.ntb.typeshift.exercise.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,6 +47,7 @@ class ProseExerciseControllerTest {
   @Autowired UserAccountRepository users;
   @Autowired PasswordEncoder encoder;
   @Autowired JwtTokenService tokens;
+  @Autowired JdbcTemplate jdbc;
 
   private String cookieValue;
 
@@ -53,6 +57,24 @@ class ProseExerciseControllerTest {
       users.save(new UserAccount(OWNER, encoder.encode(PASSWORD), "Ops Chief"));
     }
     cookieValue = tokens.issue(OWNER);
+    jdbc.execute(
+        "CREATE TABLE IF NOT EXISTS stage (id BIGINT PRIMARY KEY, name VARCHAR(64), "
+            + "sub_exam_count INTEGER, graduation_name VARCHAR(128))");
+    jdbc.update(
+        "INSERT OR IGNORE INTO stage (id, name, sub_exam_count, graduation_name) "
+            + "VALUES (1, 'QWERTZ Core', 3, 'Graduation')");
+    jdbc.execute("DROP TABLE IF EXISTS practice_session");
+    jdbc.execute(
+        "CREATE TABLE practice_session (id INTEGER PRIMARY KEY, user_id BIGINT, "
+            + "stage_id BIGINT, exercise_kind VARCHAR(8), wpm DECIMAL, cpm DECIMAL, "
+            + "correct_characters INTEGER, total_characters INTEGER, duration_seconds INTEGER, "
+            + "submitted_at TIMESTAMP)");
+    jdbc.execute("DROP TABLE IF EXISTS score_record");
+    jdbc.execute(
+        "CREATE TABLE score_record (id INTEGER PRIMARY KEY, user_id BIGINT, "
+            + "stage_id BIGINT, attempt_kind VARCHAR(16), sub_exam_number INTEGER, "
+            + "accuracy DECIMAL, substitutions INTEGER, insertions INTEGER, deletions INTEGER, "
+            + "passed BOOLEAN, submitted_at TIMESTAMP)");
   }
 
   private Cookie session() {
@@ -76,13 +98,45 @@ class ProseExerciseControllerTest {
         .andExpect(content().string(containsString("data-mode=\"prose\"")))
         .andExpect(content().string(not(containsString("data-expected"))))
         .andExpect(content().string(containsString("<textarea id=\"practice-input\"")))
-        .andExpect(content().string(containsString("New copy")));
+        .andExpect(content().string(containsString("New copy")))
+        .andExpect(content().string(containsString("Save result")));
     mvc.perform(get("/exercise/2/grad").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("magas\nTárgy: Bejelentkezési hiba")));
     mvc.perform(get("/exercise/5/exam-1").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("docket--chat-burst")));
+  }
+
+  @Test
+  void completedExerciseSavesPracticeAndScoreRecords() throws Exception {
+    String typedText =
+        "A hivatalos iratokat kérjük a főbejárat melletti iktatóba eljuttatni még a "
+            + "mai nap folyamán. Az ügyintézés határideje tizenöt munkanap, kivéve ha "
+            + "sürgősségi kérelmet nyújtott be az illetékes osztályvezetőnél...";
+
+    mvc.perform(
+            post("/exercise/4/exam-1/submit")
+                .cookie(session())
+                .param("typedText", typedText)
+                .param("elapsedSeconds", "53"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/"));
+
+    assertEquals(
+        1,
+        jdbc.queryForObject(
+            "SELECT COUNT(*) FROM practice_session WHERE user_id = "
+                + "(SELECT id FROM app_user WHERE username = ?)",
+            Integer.class,
+            OWNER));
+    assertEquals(
+        1,
+        jdbc.queryForObject(
+            "SELECT COUNT(*) FROM score_record WHERE user_id = "
+                + "(SELECT id FROM app_user WHERE username = ?) AND passed = TRUE",
+            Integer.class,
+            OWNER));
   }
 
   @Test

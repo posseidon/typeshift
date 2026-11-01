@@ -19,6 +19,10 @@
   var gaugeLabel = document.getElementById('gauge-label');
   var retryCount = document.getElementById('retry-count');
   var grossCount = document.getElementById('gross-count');
+  var submissionForm = document.getElementById('exercise-submission');
+  var submittedText = document.getElementById('submitted-text');
+  var elapsedSeconds = document.getElementById('elapsed-seconds');
+  var submitResult = document.getElementById('submit-result');
 
   var secondsElapsed = 0;
   var timerHandle = null;
@@ -41,6 +45,21 @@
     el.textContent = text;
     return el;
   }
+
+  function updateSubmission(text, complete) {
+    submittedText.value = text;
+    elapsedSeconds.value = String(secondsElapsed);
+    submitResult.disabled = !complete || secondsElapsed === 0;
+  }
+
+  submissionForm.addEventListener('submit', function () {
+    if (timerHandle !== null) {
+      clearInterval(timerHandle);
+      timerHandle = null;
+    }
+    elapsedSeconds.value = String(secondsElapsed);
+    submitResult.disabled = true;
+  });
 
   function initProse() {
     var input = document.getElementById('practice-input');
@@ -78,6 +97,7 @@
       gaugeLabel.textContent = progress + '%';
       retryCount.textContent = pad(errorCount);
       grossCount.textContent = String(typedText.length);
+      updateSubmission(typedText, typedText.length === targetText.length);
     }
 
     input.addEventListener('input', function (e) {
@@ -127,6 +147,7 @@
         ? 'Ledger reconciled \u2014 answer accepted'
         : 'Reconciliation failed \u2014 recorded answer does not match the ledger (expected: '
           + expected + ')';
+      updateSubmission(typed, true);
     }
 
     function press(code) {
