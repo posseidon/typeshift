@@ -92,6 +92,20 @@ class SchemaMigrationTest {
   }
 
   @Test
+  void graduationLifecycleTightening() throws IOException {
+    String sql = read("V11__graduation_lifecycle_tightening.sql");
+    assertThat(sql).contains("DROP CONSTRAINT ck_graduation_attempt_status");
+    assertThat(sql).contains("'IN_PROGRESS', 'PASSED', 'FAILED', 'ABANDONED'");
+    assertThat(sql).contains("ADD COLUMN component_index INTEGER");
+    assertThat(sql).contains("(attempt_kind = 'SUB_EXAM' AND component_index IS NULL)");
+    assertThat(sql).contains("(attempt_kind = 'GRADUATION' AND component_index BETWEEN 1 AND 3)");
+    assertThat(sql).contains("ON score_record (graduation_attempt_id, component_index)");
+    assertThat(sql).contains("WHERE graduation_attempt_id IS NOT NULL");
+    assertThat(sql).contains("ON graduation_attempt (user_id, stage_id)");
+    assertThat(sql).contains("WHERE status = 'IN_PROGRESS'");
+  }
+
+  @Test
   void userAccountMapsAppUser() {
     assertThat(UserAccount.class.getAnnotation(Table.class).name()).isEqualTo("app_user");
   }
