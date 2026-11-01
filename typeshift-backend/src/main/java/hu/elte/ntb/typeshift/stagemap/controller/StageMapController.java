@@ -31,10 +31,9 @@ public class StageMapController {
   @GetMapping("/stage-map")
   public String stageMap(Principal principal, Model model) {
     int currentStage = accounts.profileOf(principal.getName()).currentStage();
-    model.addAttribute("title", "TypeShift — Official Stage Map");
+    model.addAttribute("title", "title.stageMap");
     model.addAttribute("contentFragment", "stage-map");
     model.addAttribute("currentStage", currentStage);
-    model.addAttribute("stageLabel", String.format("STAGE %02d OF 05 DEPLOYED", currentStage));
     return "layout";
   }
 }

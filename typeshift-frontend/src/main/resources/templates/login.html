@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>TypeShift — Start of Shift</title>
+  <title th:text="#{title.login}">TypeShift — Start of Shift</title>
 </head>
 <body>
   <section th:fragment="content">
@@ -9,23 +9,23 @@
       <div class="docket auth-card">
         <div class="punch-strip"></div>
         <div class="inner">
-          <h1 class="headline-xl">Start here!</h1>
+          <h1 class="headline-xl" th:text="#{login.heading}">Start here!</h1>
           <p th:if="${error}" class="error label-caps" role="alert"
-             th:text="${errorText} ?: 'Invalid username or password.'">Invalid username or password.</p>
+             th:text="${errorText != null ? #messages.msg(errorText) : #messages.msg('login.invalidCredentials')}">Invalid username or password.</p>
           <form class="stack" th:action="@{/login}" method="post">
             <div class="field">
-              <label for="username">Username</label>
+              <label for="username" th:text="#{field.username}">Username</label>
               <input id="username" name="username" type="text" autocomplete="username" required>
             </div>
             <div class="field">
-              <label for="password">Password</label>
+              <label for="password" th:text="#{field.password}">Password</label>
               <input id="password" name="password" type="password" autocomplete="current-password" required>
             </div>
-            <button class="btn btn-primary btn-block" type="submit">Clock in</button>
+            <button class="btn btn-primary btn-block" type="submit" th:text="#{login.submit}">Clock in</button>
           </form>
         </div>
       </div>
-      <p class="auth-links"><a th:href="@{/signup}">No employment record yet? Open one.</a></p>
+      <p class="auth-links"><a th:href="@{/signup}" th:text="#{login.signupLink}">No employment record yet? Open one.</a></p>
     </div>
   </section>
 </body>

@@ -15,6 +15,7 @@ import hu.elte.ntb.typeshift.security.AuthCookie;
 import hu.elte.ntb.typeshift.security.JwtTokenService;
 import hu.elte.ntb.typeshift.security.RevocationService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpSession;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,14 +59,22 @@ class LoginControllerTest {
 
   @Test
   void failedLoginShowsGenericMessage() throws Exception {
-    mvc.perform(post("/login").param("username", OWNER).param("password", "wrong-pass"))
+    mvc.perform(
+            post("/login")
+                .param("lang", "en")
+                .param("username", OWNER)
+                .param("password", "wrong-pass"))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("Invalid username or password.")));
   }
 
   @Test
   void failedLoginShowsSameMessageForUnknownUser() throws Exception {
-    mvc.perform(post("/login").param("username", "ghost").param("password", "whatever1"))
+    mvc.perform(
+            post("/login")
+                .param("lang", "en")
+                .param("username", "ghost")
+                .param("password", "whatever1"))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("Invalid username or password.")));
   }
@@ -92,9 +101,35 @@ class LoginControllerTest {
       mvc.perform(post("/login").param("username", user).param("password", wrong))
           .andExpect(status().isOk());
     }
-    mvc.perform(post("/login").param("username", user).param("password", PASSWORD))
+    mvc.perform(
+            post("/login")
+                .param("lang", "en")
+                .param("username", user)
+                .param("password", PASSWORD))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("Invalid username or password.")));
+  }
+
+  @Test
+  void defaultsToVietnameseAndRemembersLanguageSelection() throws Exception {
+    mvc.perform(get("/login"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("lang=\"vi\"")))
+        .andExpect(content().string(containsString("<select name=\"lang\"")))
+        .andExpect(content().string(containsString("🇻🇳 Tiếng Việt")))
+        .andExpect(content().string(containsString("🇭🇺 Magyar")))
+        .andExpect(content().string(containsString("🇬🇧 English")))
+        .andExpect(content().string(containsString("aria-label=\"Lộ trình học\"")))
+        .andExpect(content().string(containsString("aria-label=\"Hồ sơ\"")))
+        .andExpect(content().string(containsString("aria-label=\"Đăng xuất\"")))
+        .andExpect(content().string(containsString("Đăng nhập")));
+
+    var changed = mvc.perform(get("/login").param("lang", "hu")).andReturn();
+    HttpSession session = changed.getRequest().getSession(false);
+    mvc.perform(get("/login").session((org.springframework.mock.web.MockHttpSession) session))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("lang=\"hu\"")))
+        .andExpect(content().string(containsString("Bejelentkezés")));
   }
 
   @Test

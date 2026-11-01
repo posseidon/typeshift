@@ -29,7 +29,7 @@ public class SignupController {
    */
   @GetMapping("/signup")
   public String signupView(Model model) {
-    model.addAttribute("title", "TypeShift — New Employment Record");
+    model.addAttribute("title", "title.signup");
     model.addAttribute("contentFragment", "signup");
     return "layout";
   }
@@ -54,9 +54,19 @@ public class SignupController {
     if (outcome.created()) {
       return "redirect:/login";
     }
-    model.addAttribute("title", "TypeShift — New Employment Record");
+    model.addAttribute("title", "title.signup");
     model.addAttribute("contentFragment", "signup");
-    model.addAttribute("error", outcome.error());
+    model.addAttribute("error", signupErrorKey(outcome.error()));
     return "layout";
+  }
+
+  private static String signupErrorKey(String error) {
+    return switch (error) {
+      case "Username is already taken." -> "signup.usernameTaken";
+      case "Username must be 3 to 30 characters and contain only letters, digits, or underscores." ->
+          "signup.usernameInvalid";
+      case "Password must be at least 8 characters." -> "signup.passwordInvalid";
+      default -> error;
+    };
   }
 }

@@ -37,18 +37,26 @@ class SignupControllerTest {
     if (!users.existsByUsername("taken_user")) {
       mvc.perform(
           post("/signup")
+              .param("lang", "en")
               .param("username", "taken_user")
               .param("password", "long-enough"));
     }
     mvc.perform(
-            post("/signup").param("username", "taken_user").param("password", "long-enough"))
+            post("/signup")
+                .param("lang", "en")
+                .param("username", "taken_user")
+                .param("password", "long-enough"))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("Username is already taken.")));
   }
 
   @Test
   void badUsernameShowsValidationMessage() throws Exception {
-    mvc.perform(post("/signup").param("username", "bad name!").param("password", "long-enough"))
+    mvc.perform(
+            post("/signup")
+                .param("lang", "en")
+                .param("username", "bad name!")
+                .param("password", "long-enough"))
         .andExpect(status().isOk())
         .andExpect(
             content()

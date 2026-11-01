@@ -87,6 +87,48 @@ a { color: var(--green); text-decoration-thickness: 1px; }
 
 .topnav nav a:hover { color: var(--green); text-decoration: underline; }
 
+.topnav nav .nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--ink);
+}
+
+.topnav nav .nav-icon:hover { text-decoration: none; }
+
+.nav-icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-icon:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.topnav nav .language-picker { display: flex; align-items: center; }
+
+.language-picker select {
+  border: 1px solid var(--hairline);
+  padding: 0.45rem 0.6rem;
+  background: var(--card);
+  color: var(--ink);
+  font: 700 0.75rem var(--font-mono);
+  cursor: pointer;
+}
+
+.language-picker select:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
 .site-footer {
   border-top: 1px solid var(--hairline);
   background: var(--paper-dim);
@@ -348,6 +390,8 @@ a { color: var(--green); text-decoration-thickness: 1px; }
   gap: var(--gutter);
 }
 
+.dashboard-split { grid-template-columns: 4fr 1fr; }
+
 /* ---- Gauge (progress rail with brass 95% marker) --------------------------- */
 
 .gauge { position: relative; height: 0.5rem; background: var(--paper-dim); }
@@ -410,6 +454,7 @@ table.ledger {
 .stations { display: flex; flex-direction: column; gap: var(--space-sm); }
 
 .station {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -417,6 +462,7 @@ table.ledger {
   border: 1px solid var(--hairline);
   background: var(--paper);
   padding: var(--space-sm);
+  padding-right: calc(var(--space-sm) + 2rem);
 }
 
 .station.current {
@@ -429,9 +475,59 @@ table.ledger {
 
 .station.locked { opacity: 0.6; }
 
+.station-status {
+  position: absolute;
+  top: 50%;
+  right: var(--space-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  transform: translateY(-50%);
+}
+
+.station-status svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.station-status.current,
+.station-status.unlocked { color: var(--green); }
+
+.station-status.locked { color: var(--muted); }
+
+.station-status.graduated { color: var(--approved); }
+
 .station .name { font-weight: 700; }
 
 .station .meta { color: var(--muted); }
+
+.score-status {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  vertical-align: middle;
+}
+
+.score-status svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.score-status.passed { color: var(--green); }
+
+.score-status.not-passed { color: var(--muted); }
 
 /* ---- Stage-map station cards ------------------------------------------------------ */
 
@@ -898,6 +994,7 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
 @media (max-width: 960px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .split { grid-template-columns: 1fr; }
+  .dashboard-split { grid-template-columns: 1fr; }
   .stn-body { grid-template-columns: 1fr; }
   .registry { grid-template-columns: 1fr; }
   .notes-grid { grid-template-columns: 1fr; }

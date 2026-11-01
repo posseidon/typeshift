@@ -69,7 +69,7 @@ class StageMapControllerTest {
 
   @Test
   void everyStationCardLinksToItsPracticeDockets() throws Exception {
-    mvc.perform(get("/stage-map").cookie(session()))
+    mvc.perform(get("/stage-map").param("lang", "en").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("Practice dockets")))
         .andExpect(content().string(containsString("/exercise/1/exam-1")))
@@ -95,7 +95,7 @@ class StageMapControllerTest {
   @ParameterizedTest
   @MethodSource("catalogEntries")
   void everyCatalogEntryHasItsPracticeLink(int stageId, String examKey) throws Exception {
-    mvc.perform(get("/stage-map").cookie(session()))
+    mvc.perform(get("/stage-map").param("lang", "en").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(
             content().string(containsString("href=\"/exercise/" + stageId + "/" + examKey + "\"")));
@@ -117,7 +117,7 @@ class StageMapControllerTest {
     users.save(new UserAccount(username, encoder.encode(PASSWORD), username));
     Cookie cookie = new Cookie(AuthCookie.NAME, tokens.issue(username));
 
-    mvc.perform(get("/stage-map").cookie(cookie))
+    mvc.perform(get("/stage-map").param("lang", "en").cookie(cookie))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("STAGE 01 OF 05 DEPLOYED")))
         .andExpect(content().string(containsString("Active assignment")))
@@ -134,7 +134,7 @@ class StageMapControllerTest {
     profiles.save(profile);
     Cookie cookie = new Cookie(AuthCookie.NAME, tokens.issue(username));
 
-    mvc.perform(get("/stage-map").cookie(cookie))
+    mvc.perform(get("/stage-map").param("lang", "en").cookie(cookie))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("STAGE 04 OF 05 DEPLOYED")))
         .andExpect(content().string(containsString("Certified record")))

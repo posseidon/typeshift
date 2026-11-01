@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>TypeShift — Shift Dashboard</title>
+  <title th:text="#{title.dashboard}">TypeShift — Shift Dashboard</title>
 </head>
 <body>
   <section th:fragment="content">
@@ -9,102 +9,112 @@
       <div class="page-head">
         <div>
           <div class="kicker">
-            <span class="tag tag-ink">Shift Review</span>
+            <span class="tag tag-ink" th:text="#{dashboard.shiftReview}">Shift Review</span>
             <span class="label-caps" style="color: var(--muted)">TypeShift</span>
           </div>
-          <h1 class="headline-xl">Shift Review</h1>
-          <p>Welcome, <span class="label-caps" style="color: var(--ink)" th:text="${dashboard.displayName}">Typist</span>.</p>
+          <h1 class="headline-xl" th:text="#{dashboard.shiftReview}">Shift Review</h1>
+          <p><span th:text="#{dashboard.welcome}">Welcome,</span> <span class="label-caps" style="color: var(--ink)" th:text="${dashboard.displayName}">Typist</span>.</p>
         </div>
         <div style="display:flex; gap: var(--space-sm)">
-          <a class="btn btn-secondary" th:href="@{/stage-map}">Stage Map</a>
+          <a class="btn btn-secondary" th:href="@{/stage-map}" th:text="#{nav.stageMap}">Stage Map</a>
           <a class="btn btn-primary"
-             th:href="@{/exercise/{stage}/exam-1(stage=${dashboard.currentStage})}">Practice current stage</a>
+             th:href="@{/exercise/{stage}/exam-1(stage=${dashboard.currentStage})}" th:text="#{dashboard.practiceCurrent}">Practice current stage</a>
         </div>
       </div>
 
       <div class="kpi-grid">
         <div class="docket kpi">
           <div class="reg">
-            <span class="label-caps" style="color: var(--muted)">Latest speed</span>
+            <span class="label-caps" style="color: var(--muted)" th:text="#{dashboard.latestSpeed}">Latest speed</span>
             <span class="label-caps" style="color: var(--muted)">WPM</span>
           </div>
           <div th:if="${dashboard.latestWpm != null}">
             <span class="metric-counter val-chip" th:text="${#numbers.formatDecimal(dashboard.latestWpm, 1, 2)}">0</span>
             <span class="label-caps" style="color: var(--green)">WPM</span>
           </div>
-          <div class="label-caps" th:if="${dashboard.practiceSessionCount == 0}">No practice sessions yet</div>
+          <div class="label-caps" th:if="${dashboard.practiceSessionCount == 0}" th:text="#{dashboard.noPractice}">No practice sessions yet</div>
           <div class="docket-foot label-caps">
-            <span th:text="${dashboard.practiceSessionCount} + ' sessions'">0 sessions</span>
+            <span th:text="#{dashboard.sessions(${dashboard.practiceSessionCount})}">0 sessions</span>
           </div>
         </div>
 
         <div class="docket kpi">
           <div class="reg">
-            <span class="label-caps" style="color: var(--muted)">Average accuracy</span>
+            <span class="label-caps" style="color: var(--muted)" th:text="#{dashboard.averageAccuracy}">Average accuracy</span>
             <span class="label-caps" style="color: var(--muted)">Scores</span>
           </div>
           <div th:if="${dashboard.averageAccuracyPercent != null}">
             <span class="metric-counter" th:text="${dashboard.averageAccuracyPercent} + '%'">0%</span>
           </div>
-          <div class="label-caps" th:if="${dashboard.averageAccuracyPercent == null}">No score attempts yet</div>
+          <div class="label-caps" th:if="${dashboard.averageAccuracyPercent == null}" th:text="#{dashboard.noAttempts}">No score attempts yet</div>
           <div class="docket-foot label-caps">
-            <span th:text="${dashboard.passedSubExams} + ' / ' + ${dashboard.currentStageSubExamCount} + ' sub-exams passed'">0 sub-exams passed</span>
+            <span th:text="#{dashboard.passed(${dashboard.passedSubExams}, ${dashboard.currentStageSubExamCount})}">0 sub-exams passed</span>
           </div>
         </div>
 
         <div class="docket kpi">
           <div class="reg">
-            <span class="label-caps" style="color: var(--muted)">Practice time</span>
-            <span class="label-caps" style="color: var(--muted)">Profile</span>
+            <span class="label-caps" style="color: var(--muted)" th:text="#{dashboard.practiceTime}">Practice time</span>
+            <span class="label-caps" style="color: var(--muted)" th:text="#{nav.profile}">Profile</span>
           </div>
           <div>
             <span class="metric-counter" th:text="${dashboard.totalPracticeMinutes}">0</span>
-            <span class="label-caps" style="color: var(--muted)">minutes</span>
+            <span class="label-caps" style="color: var(--muted)" th:text="#{dashboard.minutes}">minutes</span>
           </div>
           <div class="docket-foot label-caps">
-            <span th:text="${dashboard.practiceSessionCount} + ' sessions'">0 sessions</span>
+            <span th:text="#{dashboard.sessions(${dashboard.practiceSessionCount})}">0 sessions</span>
           </div>
         </div>
 
         <div class="docket kpi">
           <div class="reg">
-            <span class="label-caps" style="color: var(--muted)">Current stage</span>
-            <span class="tag tag-brass">CURRENT</span>
+            <span class="label-caps" style="color: var(--muted)" th:text="#{dashboard.currentStage}">Current stage</span>
+            <span class="tag tag-brass" th:text="#{status.current}">CURRENT</span>
           </div>
           <div>
-            <div class="headline-md">STAGE <span th:text="${dashboard.currentStage}">1</span></div>
+            <div class="headline-md"><span th:remove="tag" th:text="#{common.stage}">STAGE</span> <span th:text="${dashboard.currentStage}">1</span></div>
             <span class="label-caps" style="color: var(--green)" th:text="${dashboard.currentStageName}">Stage name</span>
           </div>
           <div class="docket-foot label-caps">
-            <span th:text="${dashboard.passedSubExams} + ' / ' + ${dashboard.currentStageSubExamCount} + ' sub-exams passed'">0 sub-exams passed</span>
+            <span th:text="#{dashboard.passed(${dashboard.passedSubExams}, ${dashboard.currentStageSubExamCount})}">0 sub-exams passed</span>
           </div>
         </div>
       </div>
 
-      <div class="split">
+      <div class="split dashboard-split">
         <div class="docket">
           <div class="docket-head">
             <div>
-              <span class="label-caps" style="color: var(--green)">SCORE RECORDS</span>
-              <h2 class="headline-md">Recent attempts</h2>
+              <span class="label-caps" style="color: var(--green)" th:text="#{dashboard.scoreRecords}">SCORE RECORDS</span>
+              <h2 class="headline-md" th:text="#{dashboard.recentAttempts}">Recent attempts</h2>
             </div>
           </div>
-          <p class="label-caps" th:if="${#lists.isEmpty(dashboard.recentScores)}">No score attempts yet</p>
+          <p class="label-caps" th:if="${#lists.isEmpty(dashboard.recentScores)}" th:text="#{dashboard.noAttempts}">No score attempts yet</p>
           <div class="ledger-wrap" th:unless="${#lists.isEmpty(dashboard.recentScores)}">
             <table class="ledger">
               <thead>
                 <tr>
-                  <th>Date</th><th>Stage</th><th>Attempt</th><th class="num">Accuracy</th>
-                  <th style="text-align:center">Result</th>
+                  <th th:text="#{common.date}">Date</th><th th:text="#{common.stage}">Stage</th><th th:text="#{dashboard.attempt}">Attempt</th><th class="num" th:text="#{dashboard.accuracy}">Accuracy</th>
+                  <th style="text-align:center" th:text="#{common.result}">Result</th>
                 </tr>
               </thead>
               <tbody>
                 <tr th:each="score : ${dashboard.recentScores}">
-                  <td class="label-caps" style="color: var(--muted)" th:text="${score.submittedAt}">Submitted at</td>
+                  <td class="label-caps" style="color: var(--muted)" th:text="${#strings.replace(#strings.substring(score.submittedAt, 0, 16), 'T', ' ')}">Submitted at</td>
                   <td class="label-caps" th:text="${score.stageName}">Stage</td>
                   <td th:text="${score.examLabel}">Sub-exam 1</td>
                   <td class="num" th:text="${score.accuracyPercent} + '%'">0%</td>
-                  <td style="text-align:center" th:text="${score.passed} ? 'Passed' : 'Not passed'">Not passed</td>
+                  <td style="text-align:center">
+                    <span class="score-status" th:classappend="${score.passed} ? 'passed' : 'not-passed'"
+                          role="img"
+                          th:attr="aria-label=${score.passed ? #messages.msg('status.passed') : #messages.msg('status.notPassed')}">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path th:if="${score.passed}" d="m8 12 2.5 2.5L16 9"/>
+                        <path th:unless="${score.passed}" d="m9 9 6 6m0-6-6 6"/>
+                      </svg>
+                    </span>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -114,21 +124,49 @@
         <div class="docket">
           <div class="docket-head">
             <div>
-              <span class="label-caps" style="color: var(--green)">STAGE PROGRESS</span>
-              <h2 class="headline-md">Stages</h2>
+              <span class="label-caps" style="color: var(--green)" th:text="#{dashboard.stageProgress}">STAGE PROGRESS</span>
+              <h2 class="headline-md" th:text="#{common.stages}">Stages</h2>
             </div>
           </div>
           <div class="stations">
             <div class="station" th:classappend="${stage.status == 'CURRENT'} ? 'current' : (${stage.status == 'LOCKED'} ? 'locked' : '')"
+                 th:attr="data-stage-id=${stage.stageId}"
                  th:each="stage : ${dashboard.stages}">
               <div>
                 <span class="label-caps" style="color: var(--muted)">
-                  STAGE <span th:text="${#numbers.formatInteger(stage.stageId, 2)}">01</span>
+                  <span th:text="#{common.stage}">STAGE</span> <span th:text="${#numbers.formatInteger(stage.stageId, 2)}">01</span>
                 </span>
                 <div class="name" th:text="${stage.name}">Stage name</div>
-                <span class="label-caps" th:text="${stage.passedSubExams} + ' / ' + ${stage.subExamCount} + ' sub-exams passed'">0 sub-exams passed</span>
+                <span class="label-caps" th:text="#{dashboard.passed(${stage.passedSubExams}, ${stage.subExamCount})}">0 sub-exams passed</span>
               </div>
-              <span class="stamp" th:text="${stage.status}">LOCKED</span>
+              <span class="station-status current" th:if="${stage.status == 'CURRENT'}"
+                    role="img" th:attr="aria-label=#{status.current}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="12" r="8"/>
+                  <circle cx="12" cy="12" r="2"/>
+                </svg>
+              </span>
+              <span class="station-status locked" th:if="${stage.status == 'LOCKED'}"
+                    role="img" th:attr="aria-label=#{status.locked}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <rect x="4" y="10" width="16" height="11" rx="2"/>
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/>
+                </svg>
+              </span>
+              <span class="station-status unlocked" th:if="${stage.status == 'UNLOCKED'}"
+                    role="img" th:attr="aria-label=#{status.unlocked}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <rect x="4" y="10" width="16" height="11" rx="2"/>
+                  <path d="M8 10V7a4 4 0 0 1 7-2m-3 10v2"/>
+                </svg>
+              </span>
+              <span class="station-status graduated" th:if="${stage.status == 'GRADUATED'}"
+                    role="img" th:attr="aria-label=#{status.graduated}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="m8 12 2.5 2.5L16 9"/>
+                </svg>
+              </span>
             </div>
           </div>
         </div>

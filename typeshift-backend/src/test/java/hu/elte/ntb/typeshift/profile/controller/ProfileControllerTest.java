@@ -59,7 +59,7 @@ class ProfileControllerTest {
 
   @Test
   void profilePageShowsStatusData() throws Exception {
-    mvc.perform(get("/profile").cookie(session()))
+    mvc.perform(get("/profile").param("lang", "en").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("owner")))
         .andExpect(content().string(containsString("Member since")))
@@ -68,9 +68,13 @@ class ProfileControllerTest {
 
   @Test
   void displayNameUpdatePersists() throws Exception {
-    mvc.perform(post("/profile/display-name").param("displayName", "Chief").cookie(session()))
+    mvc.perform(
+            post("/profile/display-name")
+                .param("lang", "en")
+                .param("displayName", "Chief")
+                .cookie(session()))
         .andExpect(status().is3xxRedirection());
-    mvc.perform(get("/profile").cookie(session()))
+    mvc.perform(get("/profile").param("lang", "en").cookie(session()))
         .andExpect(content().string(containsString("Chief")));
   }
 
@@ -83,6 +87,7 @@ class ProfileControllerTest {
     cookieValue = tokens.issue(user);
     mvc.perform(
             post("/profile/password")
+                .param("lang", "en")
                 .param("currentPassword", "not-my-pass")
                 .param("newPassword", "brand-new-pass")
                 .cookie(session()))
@@ -99,6 +104,7 @@ class ProfileControllerTest {
     cookieValue = tokens.issue(user);
     mvc.perform(
             post("/profile/password")
+                .param("lang", "en")
                 .param("currentPassword", PASSWORD)
                 .param("newPassword", "short")
                 .cookie(session()))
@@ -115,6 +121,7 @@ class ProfileControllerTest {
     cookieValue = tokens.issue(user);
     mvc.perform(
             post("/profile/password")
+                .param("lang", "en")
                 .param("currentPassword", PASSWORD)
                 .param("newPassword", "brand-new-pass")
                 .cookie(session()))

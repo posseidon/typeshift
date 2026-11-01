@@ -32,7 +32,7 @@ public class ProfileController {
    */
   @GetMapping("/profile")
   public String view(Principal principal, Model model) {
-    model.addAttribute("title", "TypeShift — Profile");
+    model.addAttribute("title", "title.profile");
     model.addAttribute("contentFragment", "profile");
     addProfileData(principal.getName(), model);
     return "layout";
@@ -69,10 +69,11 @@ public class ProfileController {
       Model model) {
     ChangePasswordOutcome outcome =
         accounts.changePassword(principal.getName(), currentPassword, newPassword);
-    model.addAttribute("title", "TypeShift — Profile");
+    model.addAttribute("title", "title.profile");
     model.addAttribute("contentFragment", "profile");
     model.addAttribute(
-        "passwordMessage", outcome.success() ? "Password changed." : outcome.error());
+        "passwordMessage",
+        outcome.success() ? "profile.passwordChanged" : passwordErrorKey(outcome.error()));
     model.addAttribute("passwordError", !outcome.success());
     addProfileData(principal.getName(), model);
     return "layout";
@@ -84,5 +85,13 @@ public class ProfileController {
     model.addAttribute("displayName", profile.displayName());
     model.addAttribute("memberSince", profile.memberSince());
     model.addAttribute("currentStage", profile.currentStage());
+  }
+
+  private static String passwordErrorKey(String error) {
+    return switch (error) {
+      case "Current password is incorrect." -> "profile.currentPasswordInvalid";
+      case "New password must be at least 8 characters." -> "profile.newPasswordInvalid";
+      default -> error;
+    };
   }
 }

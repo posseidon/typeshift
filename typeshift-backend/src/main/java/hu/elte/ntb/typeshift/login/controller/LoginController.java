@@ -33,13 +33,13 @@ public class LoginController {
    */
   @GetMapping("/login")
   public String login(@RequestParam(value = "auth", required = false) String authFlag, Model model) {
-    model.addAttribute("title", "TypeShift — Start of Shift");
+    model.addAttribute("title", "title.login");
     model.addAttribute("contentFragment", "login");
     if (authFlag == null) {
       model.addAttribute("error", false);
     } else {
       model.addAttribute("error", true);
-      model.addAttribute("errorText", "Session expired or revoked. Please sign in again.");
+      model.addAttribute("errorText", "login.sessionExpired");
     }
     return "layout";
   }
@@ -62,7 +62,7 @@ public class LoginController {
       Model model) {
     LoginResult result = logins.authenticate(username, password);
     if (!result.success()) {
-      return renderLogin(model, "Invalid username or password.");
+      return renderLogin(model, "login.invalidCredentials");
     }
     response.addHeader(HttpHeaders.SET_COOKIE, result.cookie().toString());
     return "redirect:/";
@@ -86,7 +86,7 @@ public class LoginController {
   }
 
   private String renderLogin(Model model, String errorText) {
-    model.addAttribute("title", "TypeShift — Start of Shift");
+    model.addAttribute("title", "title.login");
     model.addAttribute("contentFragment", "login");
     model.addAttribute("error", true);
     model.addAttribute("errorText", errorText);

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>TypeShift — New Employment Record</title>
+  <title th:text="#{title.signup}">TypeShift — New Employment Record</title>
 </head>
 <body>
   <section th:fragment="content">
@@ -9,29 +9,30 @@
       <div class="docket auth-card">
         <div class="punch-strip"></div>
         <div class="inner">
-          <h1 class="headline-xl">New Employment Record</h1>
-          <p class="auth-sub label-caps">Personnel Registry • Application Form TS-1</p>
-          <p th:if="${error}" class="error label-caps" role="alert" th:text="${error}">Error</p>
+          <h1 class="headline-xl" th:text="#{signup.heading}">New Employment Record</h1>
+          <p class="auth-sub label-caps" th:text="#{signup.subtitle}">Personnel Registry • Application Form TS-1</p>
+          <p th:if="${error}" class="error label-caps" role="alert"
+             th:text="${#messages.msgOrNull(error) != null ? #messages.msg(error) : error}">Error</p>
           <form class="stack" th:action="@{/signup}" method="post">
             <div class="field">
-              <label for="username">Username</label>
+              <label for="username" th:text="#{field.username}">Username</label>
               <input id="username" name="username" type="text" autocomplete="username" required>
-              <span class="form-note">3–30 chars • letters, digits, underscores</span>
+              <span class="form-note" th:text="#{signup.usernameHint}">3–30 chars • letters, digits, underscores</span>
             </div>
             <div class="field">
-              <label for="password">Password</label>
+              <label for="password" th:text="#{field.password}">Password</label>
               <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
-              <span class="form-note">Min. 8 characters</span>
+              <span class="form-note" th:text="#{signup.passwordHint}">Min. 8 characters</span>
             </div>
             <div class="field">
-              <label for="displayName">Display name (optional)</label>
+              <label for="displayName" th:text="#{field.displayNameOptional}">Display name (optional)</label>
               <input id="displayName" name="displayName" type="text">
             </div>
-            <button class="btn btn-primary btn-block" type="submit">File record</button>
+            <button class="btn btn-primary btn-block" type="submit" th:text="#{signup.submit}">File record</button>
           </form>
         </div>
       </div>
-      <p class="auth-links"><a th:href="@{/login}">Already employed? Clock in.</a></p>
+      <p class="auth-links"><a th:href="@{/login}" th:text="#{signup.loginLink}">Already employed? Clock in.</a></p>
     </div>
   </section>
 </body>

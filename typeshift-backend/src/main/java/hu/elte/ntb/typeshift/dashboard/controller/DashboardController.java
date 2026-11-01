@@ -28,7 +28,7 @@ public class DashboardController {
   @GetMapping("/")
   public String index(Model model, Principal principal) {
     model.addAttribute("dashboard", dashboardService.loadFor(principal.getName()));
-    model.addAttribute("title", "TypeShift — Shift Review");
+    model.addAttribute("title", "title.dashboard");
     model.addAttribute("contentFragment", "index");
     return "layout";
   }

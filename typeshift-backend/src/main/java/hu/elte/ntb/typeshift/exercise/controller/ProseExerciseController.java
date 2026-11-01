@@ -1,6 +1,5 @@
 package hu.elte.ntb.typeshift.exercise.controller;
 
-import hu.elte.ntb.typeshift.ai.model.ExamType;
 import hu.elte.ntb.typeshift.exercise.model.CannedExercise;
 import hu.elte.ntb.typeshift.exercise.service.CannedCatalog;
 import hu.elte.ntb.typeshift.exercise.service.ExerciseSubmissionService;
@@ -77,9 +76,8 @@ public class ProseExerciseController {
         catalog
             .find(stageId, examKey)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    model.addAttribute("title", "TypeShift — " + exercise.label());
+    model.addAttribute("title", "title.exercise");
     model.addAttribute("contentFragment", "exercise");
-    model.addAttribute("shiftState", shiftState(exercise));
     model.addAttribute("docketLabel", exercise.label());
     model.addAttribute("docketFraming", framing(exercise));
     model.addAttribute("dataTarget", exercise.displayText());
@@ -110,15 +108,6 @@ public class ProseExerciseController {
       Principal principal) {
     submissions.submit(principal.getName(), stageId, examKey, typedText, elapsedSeconds);
     return "redirect:/";
-  }
-
-  private static String shiftState(CannedExercise exercise) {
-    String kind = exercise.examType() == ExamType.GRADUATION ? " [Graduation]" : " [HU]";
-    return "Shift in progress // Stage "
-        + exercise.stageId()
-        + ": "
-        + CannedCatalog.STAGE_NAMES.get(exercise.stageId())
-        + kind;
   }
 
   private static String framing(CannedExercise exercise) {

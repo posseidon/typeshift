@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title th:text="${title} ?: 'TypeShift'">TypeShift</title>
+  <title th:text="${title != null ? #messages.msg(title) : 'TypeShift'}">TypeShift</title>
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,16 +15,45 @@
   <header class="topnav">
     <a class="brand" th:href="@{/}">TypeShift</a>
     <nav>
-      <a th:href="@{/stage-map}">Stage Map</a>
-      <a th:href="@{/profile}">Profile</a>
-      <a th:href="@{/logout}">Logout</a>
+      <a class="nav-icon" th:href="@{/stage-map}"
+         th:attr="aria-label=#{nav.stageMap},title=#{nav.stageMap}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/>
+          <path d="M9 3v15m6-12v15"/>
+        </svg>
+      </a>
+      <a class="nav-icon" th:href="@{/profile}"
+         th:attr="aria-label=#{nav.profile},title=#{nav.profile}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 21a8 8 0 0 1 16 0"/>
+        </svg>
+      </a>
+      <a class="nav-icon" th:href="@{/logout}"
+         th:attr="aria-label=#{nav.logout},title=#{nav.logout}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M10 17l5-5-5-5m5 5H3"/>
+          <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/>
+        </svg>
+      </a>
+      <form class="language-picker" method="get">
+        <select name="lang" th:attr="aria-label=#{language.label}"
+                onchange="this.form.submit()">
+          <option value="vi" th:selected="${#locale.language == 'vi'}">🇻🇳 Tiếng Việt</option>
+          <option value="hu" th:selected="${#locale.language == 'hu'}">🇭🇺 Magyar</option>
+          <option value="en" th:selected="${#locale.language == 'en'}">🇬🇧 English</option>
+        </select>
+        <noscript>
+          <button type="submit" th:text="#{language.apply}">Apply</button>
+        </noscript>
+      </form>
     </nav>
   </header>
   <!-- Content injection point: page controllers point the content fragment here. -->
   <main id="content" th:replace="~{${contentFragment} :: content}"></main>
   <footer class="site-footer">
-    <span>Bureau Division of Typing Standards • Record Archive</span>
-    <span>TypeShift • Personal learning record</span>
+    <span th:text="#{footer.archive}">Bureau Division of Typing Standards • Record Archive</span>
+    <span th:text="#{footer.record}">TypeShift • Personal learning record</span>
   </footer>
 </body>
 </html>

@@ -33,34 +33,17 @@ Login and registration forms SHALL post to the Spring endpoints, render errors i
 
 > **Status: IMPLEMENTED** — `login.html` and `signup.html` post to the controllers and render inline errors.
 
-### Requirement: Stage map page
-The stage map SHALL show the five stages with their canonical status (LOCKED, UNLOCKED, IN_PROGRESS, SUB_EXAMS_PASSED, GRADUATED), mark `currentStage` separately from status, list each stage's sub-exams with pass/not-yet state, visibly disable locked stages without working links, and show a graduation button only for SUB_EXAMS_PASSED or GRADUATED stages.
-
-#### Scenario: Locked stages are inert
-- **WHEN** a stage is locked
-- **THEN** it is visibly disabled and its links do not navigate
-
-#### Scenario: Graduation button respects eligibility
-- **WHEN** a stage has not passed all sub-exams
-- **THEN** no graduation button is offered for it
-
 > **Status: PARTIAL** — stages render from `currentStage` alone; per-sub-exam pass state, the canonical status model, and an eligibility-gated graduation button are not implemented, and locked stages still render practice links.
 
 ### Requirement: Prose exercise page
 The prose exercise page SHALL request an exercise from the server and display its text, compare characters as the user types to count misses, update speed counters periodically, and send the full typed text to the server on submit for scoring. Closing the browser mid-exercise SHALL lose the exercise with no recovery. A server error SHALL show the full stack trace and stop the exam. (OQ-3's contenteditable input is a pending decision; a textarea is currently used.)
-
-#### Scenario: Typed text is scored by the server
-- **WHEN** the user submits a prose exercise
-- **THEN** the full typed text is sent to the server, which returns the score
-
-> **Status: PARTIAL** — server fetch, display, and client-side character comparison exist, but there is no submit endpoint or server scoring; input is a textarea rather than contenteditable, and there is no server-error/stack-trace handling.
 
 ### Requirement: Numpad exercise page
 The numpad exercise page SHALL capture keydown using `KeyboardEvent.code`, accept only the ADR-006 numpad codes (ignoring other keys, with main-keyboard digits counting as misses), insert a comma on NumpadDecimal, show a NumLock reminder with a confirm checkbox that gates the exercise start, hide the live speed display for the graduation Cashier Rush, submit the typed result to the server for exact comparison, and stop with a stack trace on server error.
 
 #### Scenario: Only numpad keys are accepted
 - **WHEN** the user presses a non-numpad key during a numeric exercise
-- **THEN** it is ignored (or counted as a miss for main-keyboard digits)
+- **THEN** it is ignored.
 
 #### Scenario: Graduation hides live speed
 - **WHEN** the Stage 3 graduation Cashier Rush runs

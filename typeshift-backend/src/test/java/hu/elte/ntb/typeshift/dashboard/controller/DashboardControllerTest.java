@@ -180,7 +180,7 @@ class DashboardControllerTest {
   }
 
   private org.springframework.test.web.servlet.ResultActions page() throws Exception {
-    return mvc.perform(get("/").cookie(ownerSession));
+    return mvc.perform(get("/").param("lang", "en").cookie(ownerSession));
   }
 
   private void ensureAccount(String username, String displayName) {
@@ -320,9 +320,10 @@ class DashboardControllerTest {
   }
 
   private String stageStatus(String page, String stageNumber) {
-    int stageStart = page.indexOf("STAGE <span>" + stageNumber + "</span>");
-    int statusStart = page.indexOf("<span class=\"stamp\">", stageStart);
-    int statusEnd = page.indexOf("</span>", statusStart);
-    return page.substring(statusStart + "<span class=\"stamp\">".length(), statusEnd);
+    int stageStart = page.indexOf("data-stage-id=\"" + Integer.parseInt(stageNumber) + "\"");
+    int statusStart = page.indexOf("<span class=\"station-status", stageStart);
+    int labelStart = page.indexOf("aria-label=\"", statusStart) + "aria-label=\"".length();
+    int labelEnd = page.indexOf('"', labelStart);
+    return page.substring(labelStart, labelEnd);
   }
 }
