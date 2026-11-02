@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -96,17 +97,20 @@ class ProseExerciseControllerTest {
   }
 
   @Test
-  void proseDocketServesStageFourText() throws Exception {
+  void shellPageServesLoadingPlaceholderWithoutGeneration() throws Exception {
     mvc.perform(get("/exercise/4/exam-1").param("lang", "en").cookie(session()))
         .andExpect(status().isOk())
-        .andExpect(content().string(containsString("A hivatalos iratokat")))
-        .andExpect(content().string(containsString("Stage 4")));
-    verify(generation).generate(OWNER, catalog.find(4, "exam-1").orElseThrow());
+        .andExpect(content().string(containsString("hx-get=\"/exercise/4/exam-1/docket\"")))
+        .andExpect(content().string(containsString("id=\"exercise-loading\"")))
+        .andExpect(content().string(containsString("htmx:beforeSwap")))
+        .andExpect(content().string(containsString("Stage 4")))
+        .andExpect(content().string(not(containsString("data-target"))));
+    verify(generation, never()).generate(anyString(), any(CannedExercise.class));
   }
 
   @Test
-  void proseDocketServesTargetText() throws Exception {
-    mvc.perform(get("/exercise/4/exam-1").param("lang", "en").cookie(session()))
+  void docketFragmentServesGeneratedText() throws Exception {
+    mvc.perform(get("/exercise/4/exam-1/docket").param("lang", "en").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("id=\"typing-docket\"")))
         .andExpect(content().string(containsString("data-target=\"A hivatalos iratokat")))
@@ -114,13 +118,17 @@ class ProseExerciseControllerTest {
         .andExpect(content().string(not(containsString("data-expected"))))
         .andExpect(content().string(containsString("<textarea id=\"practice-input\"")))
         .andExpect(content().string(containsString("New copy")))
+        .andExpect(content().string(containsString("id=\"exercise-token\"")))
+        .andExpect(
+            content().string(containsString("action=\"/exercise/4/exam-1/submit\"")))
         .andExpect(content().string(containsString("Save result")));
-    mvc.perform(get("/exercise/2/grad").param("lang", "en").cookie(session()))
+    mvc.perform(get("/exercise/2/grad/docket").param("lang", "en").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("magas\nTárgy: Bejelentkezési hiba")));
-    mvc.perform(get("/exercise/5/exam-1").param("lang", "en").cookie(session()))
+    mvc.perform(get("/exercise/5/exam-1/docket").param("lang", "en").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("docket--chat-burst")));
+    verify(generation).generate(OWNER, catalog.find(4, "exam-1").orElseThrow());
   }
 
   @Test
@@ -160,7 +168,7 @@ class ProseExerciseControllerTest {
 
   @Test
   void numericDocketServesKeypad() throws Exception {
-    mvc.perform(get("/exercise/3/exam-1").cookie(session()))
+    mvc.perform(get("/exercise/3/exam-1/docket").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("data-mode=\"numeric\"")))
         .andExpect(content().string(containsString("id=\"keypad\"")));
@@ -168,7 +176,7 @@ class ProseExerciseControllerTest {
 
   @Test
   void numericDocketServesPadAndVerdict() throws Exception {
-    mvc.perform(get("/exercise/3/exam-1").cookie(session()))
+    mvc.perform(get("/exercise/3/exam-1/docket").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("id=\"math-verdict\"")))
         .andExpect(content().string(containsString("id=\"practice-pad\"")))
@@ -178,7 +186,7 @@ class ProseExerciseControllerTest {
 
   @Test
   void proseDocketOmitsKeyPad() throws Exception {
-    mvc.perform(get("/exercise/4/exam-1").cookie(session()))
+    mvc.perform(get("/exercise/4/exam-1/docket").cookie(session()))
         .andExpect(status().isOk())
         .andExpect(content().string(not(containsString("id=\"keypad\""))))
         .andExpect(content().string(not(containsString("id=\"practice-pad\""))))
@@ -187,7 +195,7 @@ class ProseExerciseControllerTest {
 
   @Test
   void graduationDocketServes() throws Exception {
-    mvc.perform(get("/exercise/4/grad").cookie(session())).andExpect(status().isOk());
+    mvc.perform(get("/exercise/4/grad/docket").cookie(session())).andExpect(status().isOk());
   }
 
   @Test
@@ -198,6 +206,25 @@ class ProseExerciseControllerTest {
   @Test
   void unknownExamKeyGivesNotFound() throws Exception {
     mvc.perform(get("/exercise/4/nope").cookie(session())).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void unknownStageOnDocketGivesNotFound() throws Exception {
+    mvc.perform(get("/exercise/9/exam-1/docket").cookie(session()))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void unknownExamKeyOnDocketGivesNotFound() throws Exception {
+    mvc.perform(get("/exercise/4/nope/docket").cookie(session()))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void unauthenticatedDocketRequestIsRebuffed() throws Exception {
+    mvc.perform(get("/exercise/4/exam-1/docket"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/login?auth=MISSING"));
   }
 
   @Test

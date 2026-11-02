@@ -1,6 +1,6 @@
 # Typing App — OpenSpec Specification Set
 
-Single-user Java/Spring Boot typing-learning app. Five stages, Thymeleaf UI, PostgreSQL (Docker Compose in dev, Supabase in prod), and Azure OpenAI content generation in all profiles.
+Single-user Java/Spring Boot typing-learning app. Five stages, Thymeleaf UI, PostgreSQL (Docker Compose in dev, Supabase in prod), and Gemini content generation in all profiles.
 
 ## Folder layout
 - adrs/ — 18 locked Architecture Decision Records. Every story references these by number.

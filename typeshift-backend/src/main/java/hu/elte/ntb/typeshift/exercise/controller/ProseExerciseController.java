@@ -73,7 +73,8 @@ public class ProseExerciseController {
   }
 
   /**
-   * Renders one canned exercise docket composed into the layout shell.
+   * Renders the exercise shell instantly: readout bar, notices, loading placeholder, notes. The
+   * generated docket is fetched separately so LLM latency never blocks the page.
    *
    * @param stageId station identifier
    * @param examKey catalog key within the station
@@ -82,7 +83,29 @@ public class ProseExerciseController {
    * @throws ResponseStatusException with 404 when the stage and exam pair is unknown
    */
   @GetMapping("/exercise/{stageId}/{examKey}")
-  public String lookup(
+  public String lookup(@PathVariable int stageId, @PathVariable String examKey, Model model) {
+    if (catalog.find(stageId, examKey).isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+    model.addAttribute("title", "title.exercise");
+    model.addAttribute("contentFragment", "exercise");
+    model.addAttribute("stageId", stageId);
+    model.addAttribute("examKey", examKey);
+    return "layout";
+  }
+
+  /**
+   * Generates and serves only the exercise docket fragment; the shell loads it asynchronously.
+   *
+   * @param stageId station identifier
+   * @param examKey catalog key within the station
+   * @param principal authenticated learner
+   * @param model the view model
+   * @return the docket fragment of the exercise template
+   * @throws ResponseStatusException with 404 when the stage and exam pair is unknown
+   */
+  @GetMapping("/exercise/{stageId}/{examKey}/docket")
+  public String docket(
       @PathVariable int stageId,
       @PathVariable String examKey,
       Principal principal,
@@ -92,8 +115,6 @@ public class ProseExerciseController {
             .find(stageId, examKey)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     CannedExercise exercise = generation.generate(principal.getName(), definition);
-    model.addAttribute("title", "title.exercise");
-    model.addAttribute("contentFragment", "exercise");
     model.addAttribute("docketLabel", docketLabel(exercise));
     model.addAttribute("docketFraming", framing(exercise));
     model.addAttribute("dataTarget", exercise.displayText());
@@ -103,7 +124,7 @@ public class ProseExerciseController {
     model.addAttribute("exerciseToken", tickets.issue(principal.getName(), exercise));
     model.addAttribute("stageId", stageId);
     model.addAttribute("examKey", examKey);
-    return "layout";
+    return "exercise :: docket";
   }
 
   /**

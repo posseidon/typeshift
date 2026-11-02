@@ -21,7 +21,7 @@ public class ProviderConnectivityController {
 
   public ProviderConnectivityController(ChatModel chatModel, AiProperties props) {
     this.chatModel = chatModel;
-    this.baseUrl = props.azureEndpoint();
+    this.baseUrl = props.providerEndpoint();
   }
 
   /**

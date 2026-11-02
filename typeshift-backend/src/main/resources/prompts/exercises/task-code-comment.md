@@ -1,0 +1,1 @@
+Write only one concise B1-level Hungarian technical code annotation describing the behavior implied by the story. Use one or more lines prefixed with `//`; explain the system's purpose or one important step in familiar words. Include no executable code, no backticks, and no Markdown code fence.

@@ -15,24 +15,20 @@ class ProfileConfigTest {
   }
 
   @Test
-  void azureAiConfigurationIsSharedByAllProfiles() throws IOException {
+  void geminiAiConfigurationIsSharedByAllProfiles() throws IOException {
     PropertySource<?> shared = load("application", "application.yml");
     PropertySource<?> dev = load("application-dev", "application-dev.yml");
 
-    assertThat(shared.getProperty("spring.ai.azure.openai.endpoint"))
-        .isEqualTo("${AZURE_OPENAI_ENDPOINT:${AZURE_OPEN_AI_ENDPOINT:https://localhost}}");
-    assertThat(shared.getProperty("spring.ai.azure.openai.api-key"))
-        .isEqualTo("${AZURE_OPENAI_API_KEY:${AZURE_OPEN_AI_KEY:}}");
-    assertThat(shared.getProperty("spring.ai.azure.openai.chat.options.deployment-name"))
-        .isEqualTo("${AZURE_OPENAI_DEPLOYMENT:${AZURE_OPEN_AI_DEPLOYMENT:}}");
-    assertThat(shared.getProperty("typeshift.ai.azure-endpoint"))
-        .isEqualTo("${spring.ai.azure.openai.endpoint}");
-    assertThat(shared.getProperty("typeshift.ai.azure-api-key"))
-        .isEqualTo("${spring.ai.azure.openai.api-key}");
-    assertThat(shared.getProperty("typeshift.ai.azure-deployment"))
-        .isEqualTo("${spring.ai.azure.openai.chat.options.deployment-name}");
+    assertThat(shared.getProperty("spring.ai.google.genai.api-key"))
+        .isEqualTo("${GEMINI_API_KEY:}");
+    assertThat(shared.getProperty("spring.ai.google.genai.chat.options.model"))
+        .isEqualTo("gemini-3.5-flash-lite");
     assertThat(shared.getProperty("app.chat.model-name"))
-        .isEqualTo("${spring.ai.azure.openai.chat.options.deployment-name}");
+        .isEqualTo("${spring.ai.google.genai.chat.options.model}");
+    assertThat(shared.getProperty("typeshift.ai.provider-endpoint"))
+        .isEqualTo("https://generativelanguage.googleapis.com");
+    assertThat(shared.getProperty("spring.ai.azure.openai.api-key")).isNull();
+    assertThat(shared.getProperty("typeshift.ai.azure-endpoint")).isNull();
     assertThat(dev.getProperty("spring.config.import"))
         .isEqualTo("optional:file:../.env[.properties]");
     assertThat(dev.getProperty("spring.datasource.url"))

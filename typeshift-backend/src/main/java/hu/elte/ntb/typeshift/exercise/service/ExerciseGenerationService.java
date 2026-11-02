@@ -9,7 +9,7 @@ import hu.elte.ntb.typeshift.ai.model.ExamType;
 import hu.elte.ntb.typeshift.ai.model.LanguageTarget;
 import hu.elte.ntb.typeshift.ai.model.TaskType;
 import hu.elte.ntb.typeshift.ai.service.AiProviderException;
-import hu.elte.ntb.typeshift.ai.service.AzureOpenAIContentService;
+import hu.elte.ntb.typeshift.ai.service.GeminiContentService;
 import hu.elte.ntb.typeshift.ai.service.MathExpressionEvaluator;
 import hu.elte.ntb.typeshift.exercise.model.CannedExercise;
 import java.nio.charset.StandardCharsets;
@@ -29,12 +29,12 @@ public class ExerciseGenerationService {
 
   private static final int MAX_TEXT_LENGTH = 4_000;
 
-  private final AzureOpenAIContentService ai;
+  private final GeminiContentService ai;
   private final UserAccountService accounts;
   private final JdbcTemplate jdbc;
 
   public ExerciseGenerationService(
-      AzureOpenAIContentService ai, UserAccountService accounts, JdbcTemplate jdbc) {
+      GeminiContentService ai, UserAccountService accounts, JdbcTemplate jdbc) {
     this.ai = ai;
     this.accounts = accounts;
     this.jdbc = jdbc;
@@ -44,6 +44,7 @@ public class ExerciseGenerationService {
     long userId = accounts.accountIdFor(username);
     List<String> recentHashes = recentHashes(userId);
     List<String> focusKeys = focusKeys(userId);
+    List<String> exerciseFocusKeys = exerciseFocusKeys(definition, focusKeys);
     TaskType previousTask = previousTask(userId);
     TaskType taskType = taskType(definition, previousTask);
     AiRequest request =
@@ -51,21 +52,21 @@ public class ExerciseGenerationService {
             definition.stageId(),
             definition.examType(),
             subExamNumber(definition),
-            focusKeys,
+            exerciseFocusKeys,
             recentHashes,
             LanguageTarget.HUNGARIAN,
             taskType);
     AiResponse response = ai.generate(request);
     String expectedAnswer;
     try {
-      expectedAnswer = validate(definition, response, focusKeys);
+      expectedAnswer = validate(definition, response, exerciseFocusKeys);
     } catch (IllegalArgumentException e) {
-      throw new AiProviderException("Azure OpenAI returned invalid exercise content", e);
+      throw new AiProviderException("Gemini returned invalid exercise content", e);
     }
     String contentHash = sha256(response.displayText());
     if (recentHashes.contains(contentHash)) {
       throw new AiProviderException(
-          "Azure OpenAI returned content that duplicates a recent exercise",
+          "Gemini returned content that duplicates a recent exercise",
           new IllegalArgumentException("Generated content duplicates a recent exercise"));
     }
     jdbc.update(
@@ -133,6 +134,16 @@ public class ExerciseGenerationService {
       return 0;
     }
     return Integer.parseInt(definition.examKey().substring("exam-".length()));
+  }
+
+  private static List<String> exerciseFocusKeys(
+      CannedExercise definition, List<String> focusKeys) {
+    if (!definition.isMath()) {
+      return focusKeys;
+    }
+    return focusKeys.stream()
+        .filter(key -> key.length() == 1 && "0123456789, +*/-".indexOf(key.charAt(0)) >= 0)
+        .toList();
   }
 
   private static String validate(

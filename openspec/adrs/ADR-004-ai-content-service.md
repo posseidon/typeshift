@@ -28,7 +28,7 @@ The application, not the model, computes the SHA-256 content hash from `displayT
 
 ## Decision
 
-One `AzureOpenAIContentService` selects a stage-native prompt and sends it through Spring AI's configured Azure OpenAI `ChatModel`. The starter uses the endpoint, API key, and deployment configured by `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, and `AZURE_OPENAI_DEPLOYMENT`. Application code does not construct provider REST requests. No runtime provider selection is used.
+One `GeminiContentService` selects a stage-native prompt and sends it through Spring AI's configured Google GenAI `ChatModel`. The starter uses `GEMINI_API_KEY` and the `gemini-3.5-flash-lite` model. Application code does not construct provider REST requests. No runtime provider selection is used.
 
 The service returns the request/response contract above and wraps provider failures in `AiProviderException`, retaining the original cause. Exercises are not persisted; the application retains only per-user content hashes for deduplication.
 

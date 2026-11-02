@@ -1,11 +1,11 @@
 ## Purpose
 
-Generate stage-appropriate typing content through one Azure OpenAI-backed service.
+Generate stage-appropriate typing content through one Gemini-backed service.
 
-### Requirement: Azure OpenAI generation
-The application SHALL use one Azure-specific content-generation service backed by Spring AI's Azure OpenAI starter and configured `ChatModel` in every runtime profile. The deployment name SHALL exactly match a deployment registered at the configured endpoint. Application code SHALL NOT construct provider REST requests. Endpoint, key, and deployment SHALL be configurable through `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, and `AZURE_OPENAI_DEPLOYMENT`.
+### Requirement: Gemini generation
+The application SHALL use `GeminiContentService` backed by Spring AI's Google GenAI starter and configured `ChatModel` in every runtime profile. The model SHALL be `gemini-3.5-flash-lite`, and the Gemini Developer API key SHALL be supplied through `GEMINI_API_KEY`. Application code SHALL NOT construct provider REST requests or use runtime provider selection.
 
-The service SHALL return the AI response envelope and wrap transport, serialization, and response errors in `AiProviderException`, preserving the cause. The application SHALL not use a provider-neutral interface or runtime provider selection.
+The service SHALL return the AI response envelope and wrap transport, serialization, and response errors in `AiProviderException`, preserving the cause.
 
 ### Requirement: Stage-aware exercise generation
 Each exercise request SHALL select a prompt according to the stage-native content format:

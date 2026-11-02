@@ -18,7 +18,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 class ProviderConnectivityControllerTest {
 
   private final AiProperties props =
-      new AiProperties("http://azure.example", "test-api-key", "Phi-4-mini-instruct");
+      new AiProperties("https://generativelanguage.googleapis.com");
   private final ChatModel chatModel = mock(ChatModel.class);
 
   @Test
@@ -30,7 +30,7 @@ class ProviderConnectivityControllerTest {
         new ProviderConnectivityController(chatModel, props).connectivity();
 
     assertThat(status.reachable()).isTrue();
-    assertThat(status.endpoint()).isEqualTo("http://azure.example");
+    assertThat(status.endpoint()).isEqualTo("https://generativelanguage.googleapis.com");
   }
 
   @Test
@@ -41,5 +41,6 @@ class ProviderConnectivityControllerTest {
         new ProviderConnectivityController(chatModel, props).connectivity();
 
     assertThat(status.reachable()).isFalse();
+    assertThat(status.endpoint()).isEqualTo("https://generativelanguage.googleapis.com");
   }
 }

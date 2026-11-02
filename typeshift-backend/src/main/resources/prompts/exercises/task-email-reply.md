@@ -1,0 +1,1 @@
+Write a B1-level Hungarian email reply with one subject line beginning `Tárgy:`, a fitting greeting, a body of 2–4 clear sentences, and a brief sign-off. Answer the scenario directly in a polite, natural tone; avoid idioms and unexplained specialist terms.

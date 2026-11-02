@@ -11,7 +11,6 @@ import hu.elte.ntb.typeshift.ai.model.AiRequest;
 import hu.elte.ntb.typeshift.ai.model.AiResponse;
 import hu.elte.ntb.typeshift.ai.model.ExamType;
 import hu.elte.ntb.typeshift.ai.model.LanguageTarget;
-import hu.elte.ntb.typeshift.config.AiProperties;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,12 +22,10 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
-class AzureOpenAIContentServiceTest {
+class GeminiContentServiceTest {
 
   private final ObjectMapper mapper = new ObjectMapper();
   private final ChatModel chatModel = mock(ChatModel.class);
-  private final AiProperties props =
-      new AiProperties("http://azure.example", "test-api-key", "Phi-4-mini-instruct");
 
   private static AiRequest request() {
     return new AiRequest(
@@ -46,8 +43,7 @@ class AzureOpenAIContentServiceTest {
     when(chatModel.call(any(Prompt.class)))
         .thenReturn(response(mapper.writeValueAsString(new AiResponse("1+1"))));
 
-    AzureOpenAIContentService service =
-        new AzureOpenAIContentService(chatModel, props, mapper, new AiPromptFactory());
+    GeminiContentService service = new GeminiContentService(chatModel, mapper);
     AiResponse resp = service.generate(request());
 
     assertThat(resp.displayText()).isEqualTo("1+1");
@@ -57,11 +53,11 @@ class AzureOpenAIContentServiceTest {
   void providerErrorBecomesAiProviderExceptionWithCause() {
     when(chatModel.call(any(Prompt.class))).thenThrow(new IllegalStateException("provider error"));
 
-    AzureOpenAIContentService service =
-        new AzureOpenAIContentService(chatModel, props, mapper, new AiPromptFactory());
+    GeminiContentService service = new GeminiContentService(chatModel, mapper);
 
     assertThatThrownBy(() -> service.generate(request()))
         .isInstanceOf(AiProviderException.class)
+        .hasMessage("Gemini generation failed")
         .hasCauseInstanceOf(Exception.class);
   }
 
@@ -69,8 +65,7 @@ class AzureOpenAIContentServiceTest {
   void nonJsonResponseBecomesAiProviderException() throws Exception {
     when(chatModel.call(any(Prompt.class))).thenReturn(response("not-json"));
 
-    AzureOpenAIContentService service =
-        new AzureOpenAIContentService(chatModel, props, mapper, new AiPromptFactory());
+    GeminiContentService service = new GeminiContentService(chatModel, mapper);
 
     assertThatThrownBy(() -> service.generate(request())).isInstanceOf(AiProviderException.class);
   }
@@ -82,8 +77,7 @@ class AzureOpenAIContentServiceTest {
     when(chatModel.call(any(Prompt.class)))
         .thenReturn(response(mapper.writeValueAsString(new AiResponse(generatedContent))));
 
-    AzureOpenAIContentService service =
-        new AzureOpenAIContentService(chatModel, props, mapper, new AiPromptFactory());
+    GeminiContentService service = new GeminiContentService(chatModel, mapper);
 
     service.generate(request());
 
@@ -97,8 +91,7 @@ class AzureOpenAIContentServiceTest {
     String json = mapper.writeValueAsString(new AiResponse("text"));
     when(chatModel.call(any(Prompt.class))).thenReturn(response("```json\n" + json + "\n```"));
 
-    AzureOpenAIContentService service =
-        new AzureOpenAIContentService(chatModel, props, mapper, new AiPromptFactory());
+    GeminiContentService service = new GeminiContentService(chatModel, mapper);
     AiResponse resp = service.generate(request());
 
     assertThat(resp.displayText()).isEqualTo("text");

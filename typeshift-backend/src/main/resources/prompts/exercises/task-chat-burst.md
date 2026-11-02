@@ -1,0 +1,1 @@
+Write a B1-level Hungarian chat burst of 1–3 short sentences total. You may use plain speaker labels such as `Anna:` on separate lines, with at most one sentence per line. Do not prefix lines with hyphens or other Markdown bullets. Use familiar words and a natural, direct tone; add no narration or idioms.
