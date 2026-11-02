@@ -123,6 +123,7 @@
               th:action="@{/exercise/{stageId}/{examKey}/submit(stageId=${stageId},examKey=${examKey})}">
           <input id="submitted-text" name="typedText" type="hidden">
           <input id="elapsed-seconds" name="elapsedSeconds" type="hidden">
+          <input id="exercise-token" name="exerciseToken" type="hidden" th:value="${exerciseToken}">
           <button id="submit-result" class="btn" type="submit" disabled th:text="#{exercise.save}">Save result</button>
         </form>
         <div class="key-hints label-caps">

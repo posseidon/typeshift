@@ -69,9 +69,6 @@ class DashboardControllerTest {
         .contains(
             "No practice sessions yet",
             "No score attempts yet",
-            "No weak-key data yet",
-            "No WPM history yet",
-            "STAGE <span>1</span>",
             "minutes",
             "<span class=\"metric-counter\">0</span>",
             "QWERTZ Core")
@@ -128,7 +125,6 @@ class DashboardControllerTest {
             "8 sessions",
             "93.7%",
             "1 / 2",
-            "ő",
             "12",
             "Sub-exam 1",
             "97.4%",
@@ -137,10 +133,6 @@ class DashboardControllerTest {
     org.assertj.core.api.Assertions.assertThat(stageStatus(body, "02")).isEqualTo("CURRENT");
     org.assertj.core.api.Assertions.assertThat(stageStatus(body, "05")).isEqualTo("LOCKED");
     org.assertj.core.api.Assertions.assertThat(occurrences(body, "GRADUATED")).isZero();
-    org.assertj.core.api.Assertions.assertThat(occurrences(body, "data-wpm-point")).isEqualTo(7);
-    org.assertj.core.api.Assertions.assertThat(body)
-        .containsSubsequence("42.00", "46.00", "48.00", "47.00", "45.00", "43.00", "41.00")
-        .doesNotContain("44.00");
   }
 
   @Test

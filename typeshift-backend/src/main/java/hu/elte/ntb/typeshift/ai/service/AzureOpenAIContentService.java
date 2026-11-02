@@ -1,41 +1,63 @@
 package hu.elte.ntb.typeshift.ai.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hu.elte.ntb.typeshift.ai.model.AiRequest;
 import hu.elte.ntb.typeshift.ai.model.AiResponse;
 import hu.elte.ntb.typeshift.config.AiProperties;
-import java.util.List;
-import java.util.Map;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
+import java.util.Optional;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.stereotype.Service;
 
-/** Azure OpenAI provider, active in the prod profile. */
-// Fail-fast startup + Spring DI: constructor throws on missing config; ObjectMapper is a shared bean.
-@SuppressFBWarnings({"CT_CONSTRUCTOR_THROW", "EI_EXPOSE_REP2"})
-@Component
-@Profile("prod")
-public class AzureOpenAIContentService implements AIContentService {
+/** Generates exercise content through Spring AI's configured chat model. */
+// Spring DI: the injected ObjectMapper is a shared, effectively immutable bean.
+@SuppressFBWarnings("EI_EXPOSE_REP2")
+@Service
+public class AzureOpenAIContentService {
 
-  private static final String API_VERSION = "2024-02-01";
-
-  private final RestClient client;
+  private final ChatModel chatModel;
   private final String endpoint;
   private final String apiKey;
   private final String deployment;
   private final ObjectMapper mapper;
+  private final AiPromptFactory prompts;
 
   public AzureOpenAIContentService(
-      RestClient.Builder builder, AiProperties props, ObjectMapper mapper) {
-    this.client = builder.build();
-    this.endpoint = props.azureEndpoint();
+      ChatModel chatModel,
+      AiProperties props,
+      ObjectMapper mapper,
+      AiPromptFactory prompts) {
+    this.chatModel = chatModel;
+    this.endpoint = normalizeEndpoint(props.azureEndpoint());
     this.apiKey = props.azureApiKey();
     this.deployment = props.azureDeployment();
     this.mapper = mapper;
+    this.prompts = prompts;
+  }
+
+  public AiResponse generate(AiRequest request) {
+    try {
+      requireConfigured();
+      String content = chatModel.call(new Prompt(prompts.create(request)))
+          .getResult()
+          .getOutput()
+          .getText();
+      return mapper.readValue(extractJson(Optional.ofNullable(content).orElse("")), AiResponse.class);
+    } catch (JsonProcessingException | RuntimeException e) {
+      throw new AiProviderException("Azure OpenAI generation failed", e);
+    }
+  }
+
+  // Models occasionally wrap the JSON in markdown fences or prose; extract the object.
+  private static String extractJson(String content) {
+    int start = content.indexOf('{');
+    int end = content.lastIndexOf('}');
+    return start >= 0 && end > start ? content.substring(start, end + 1) : content;
+  }
+
+  private void requireConfigured() {
     if (endpoint == null
         || endpoint.isBlank()
         || apiKey == null
@@ -48,26 +70,14 @@ public class AzureOpenAIContentService implements AIContentService {
     }
   }
 
-  @Override
-  public AiResponse generate(AiRequest request) {
-    try {
-      String prompt = mapper.writeValueAsString(request);
-      String uri =
-          endpoint + "/openai/deployments/" + deployment + "/chat/completions?api-version=" + API_VERSION;
-      String body =
-          client
-              .post()
-              .uri(uri)
-              .header("api-key", apiKey)
-              .contentType(MediaType.APPLICATION_JSON)
-              .body(Map.of("messages", List.of(Map.of("role", "user", "content", prompt))))
-              .retrieve()
-              .body(String.class);
-      JsonNode node = mapper.readTree(body);
-      String content = node.get("choices").get(0).get("message").get("content").asText();
-      return mapper.readValue(content, AiResponse.class);
-    } catch (JsonProcessingException | RuntimeException e) {
-      throw new AiProviderException("Azure OpenAI generation failed", e);
+  private static String normalizeEndpoint(String value) {
+    if (value == null) {
+      return null;
     }
+    String endpoint = value.strip();
+    while (endpoint.endsWith("/")) {
+      endpoint = endpoint.substring(0, endpoint.length() - 1);
+    }
+    return endpoint;
   }
 }

@@ -42,13 +42,22 @@ public class ExerciseSubmissionService {
   @Transactional
   public void submit(
       String username, int stageId, String examKey, String typedText, int elapsedSeconds) {
-    if (elapsedSeconds < 1 || elapsedSeconds > 86_400) {
-      throw new IllegalArgumentException("Elapsed time must be between 1 second and 24 hours");
-    }
     CannedExercise exercise =
         catalog
             .find(stageId, examKey)
             .orElseThrow(() -> new IllegalArgumentException("Unknown exercise"));
+    submit(username, exercise, typedText, elapsedSeconds);
+  }
+
+  @Transactional
+  public void submit(
+      String username, CannedExercise exercise, String typedText, int elapsedSeconds) {
+    if (elapsedSeconds < 1 || elapsedSeconds > 86_400) {
+      throw new IllegalArgumentException("Elapsed time must be between 1 second and 24 hours");
+    }
+    if (exercise == null) {
+      throw new IllegalArgumentException("Exercise is required");
+    }
     String expected = exercise.expectedAnswer();
     String submitted = typedText == null ? "" : typedText;
     if (submitted.length() > expected.length()) {
@@ -79,7 +88,7 @@ public class ExerciseSubmissionService {
             + "correct_characters, total_characters, duration_seconds, submitted_at) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         userId,
-        stageId,
+        exercise.stageId(),
         exercise.isMath() ? "MATH" : "PROSE",
         wpm,
         cpm,
@@ -93,8 +102,8 @@ public class ExerciseSubmissionService {
               + "accuracy, substitutions, insertions, deletions, passed, submitted_at) "
               + "VALUES (?, ?, 'SUB_EXAM', ?, ?, ?, ?, ?, ?, ?)",
           userId,
-          stageId,
-          subExamNumber(examKey),
+          exercise.stageId(),
+          subExamNumber(exercise.examKey()),
           accuracy,
           edits.substitutions(),
           edits.insertions(),

@@ -1,17 +1,12 @@
 package hu.elte.ntb.typeshift.ai.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
- * Response envelope shared by every AI provider (ADR-004).
+ * Azure model response before the application adds its content hash (ADR-004).
  *
- * @param contentType PROSE or MATH
  * @param displayText text the user types
- * @param expectedAnswer PROSE = displayText, MATH = decimal result
- * @param contentHash SHA-256 of displayText
- * @param estimatedDurationSeconds expected typing duration
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record AiResponse(
-    ContentType contentType,
-    String displayText,
-    String expectedAnswer,
-    String contentHash,
-    int estimatedDurationSeconds) {}
+    String displayText) {}

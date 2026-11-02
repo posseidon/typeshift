@@ -2,7 +2,10 @@ package hu.elte.ntb.typeshift.exercise.controller;
 
 import hu.elte.ntb.typeshift.exercise.model.CannedExercise;
 import hu.elte.ntb.typeshift.exercise.service.CannedCatalog;
+import hu.elte.ntb.typeshift.exercise.service.ExerciseGenerationService;
 import hu.elte.ntb.typeshift.exercise.service.ExerciseSubmissionService;
+import hu.elte.ntb.typeshift.exercise.service.ExerciseTicketService;
+import io.jsonwebtoken.JwtException;
 import java.security.Principal;
 import java.util.Locale;
 import java.util.Map;
@@ -44,11 +47,19 @@ public class ProseExerciseController {
       Map.entry("5/grad", "three-task sequence run"));
 
   private final CannedCatalog catalog;
+  private final ExerciseGenerationService generation;
   private final ExerciseSubmissionService submissions;
+  private final ExerciseTicketService tickets;
 
-  public ProseExerciseController(CannedCatalog catalog, ExerciseSubmissionService submissions) {
+  public ProseExerciseController(
+      CannedCatalog catalog,
+      ExerciseGenerationService generation,
+      ExerciseSubmissionService submissions,
+      ExerciseTicketService tickets) {
     this.catalog = catalog;
+    this.generation = generation;
     this.submissions = submissions;
+    this.tickets = tickets;
   }
 
   /**
@@ -71,19 +82,25 @@ public class ProseExerciseController {
    * @throws ResponseStatusException with 404 when the stage and exam pair is unknown
    */
   @GetMapping("/exercise/{stageId}/{examKey}")
-  public String lookup(@PathVariable int stageId, @PathVariable String examKey, Model model) {
-    CannedExercise exercise =
+  public String lookup(
+      @PathVariable int stageId,
+      @PathVariable String examKey,
+      Principal principal,
+      Model model) {
+    CannedExercise definition =
         catalog
             .find(stageId, examKey)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    CannedExercise exercise = generation.generate(principal.getName(), definition);
     model.addAttribute("title", "title.exercise");
     model.addAttribute("contentFragment", "exercise");
-    model.addAttribute("docketLabel", exercise.label());
+    model.addAttribute("docketLabel", docketLabel(exercise));
     model.addAttribute("docketFraming", framing(exercise));
     model.addAttribute("dataTarget", exercise.displayText());
     model.addAttribute("dataExpected", exercise.isMath() ? exercise.expectedAnswer() : null);
     model.addAttribute("dataMode", exercise.isMath() ? "numeric" : "prose");
     model.addAttribute("taskClass", taskClass(exercise));
+    model.addAttribute("exerciseToken", tickets.issue(principal.getName(), exercise));
     model.addAttribute("stageId", stageId);
     model.addAttribute("examKey", examKey);
     return "layout";
@@ -105,12 +122,34 @@ public class ProseExerciseController {
       @PathVariable String examKey,
       @RequestParam String typedText,
       @RequestParam int elapsedSeconds,
+      @RequestParam String exerciseToken,
       Principal principal) {
-    submissions.submit(principal.getName(), stageId, examKey, typedText, elapsedSeconds);
+    CannedExercise exercise;
+    try {
+      exercise = tickets.verify(exerciseToken, principal.getName(), stageId, examKey);
+    } catch (JwtException | IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid exercise ticket", e);
+    }
+    submissions.submit(principal.getName(), exercise, typedText, elapsedSeconds);
     return "redirect:/";
   }
 
+  private static String docketLabel(CannedExercise exercise) {
+    if (exercise.stageId() == 5 && exercise.taskType() != null) {
+      return switch (exercise.taskType()) {
+        case CHAT_BURST -> "Chat burst";
+        case EMAIL_REPLY -> "Email reply";
+        case DOCUMENT_PARAGRAPH -> "Document paragraph";
+        case CODE_COMMENT -> "Code comment";
+      };
+    }
+    return exercise.label();
+  }
+
   private static String framing(CannedExercise exercise) {
+    if (exercise.stageId() == 5 && exercise.taskType() != null) {
+      return docketLabel(exercise) + " transcription";
+    }
     return FRAMING.getOrDefault(exercise.stageId() + "/" + exercise.examKey(), exercise.label());
   }
 

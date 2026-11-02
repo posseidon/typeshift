@@ -1,8 +1,12 @@
 package hu.elte.ntb.typeshift.exercise.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -12,6 +16,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hu.elte.ntb.typeshift.account.model.UserAccount;
 import hu.elte.ntb.typeshift.account.repository.UserAccountRepository;
+import hu.elte.ntb.typeshift.exercise.model.CannedExercise;
+import hu.elte.ntb.typeshift.exercise.service.CannedCatalog;
+import hu.elte.ntb.typeshift.exercise.service.ExerciseGenerationService;
+import hu.elte.ntb.typeshift.exercise.service.ExerciseTicketService;
 import hu.elte.ntb.typeshift.security.AuthCookie;
 import hu.elte.ntb.typeshift.security.JwtTokenService;
 import jakarta.servlet.http.Cookie;
@@ -20,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
@@ -48,6 +57,9 @@ class ProseExerciseControllerTest {
   @Autowired PasswordEncoder encoder;
   @Autowired JwtTokenService tokens;
   @Autowired JdbcTemplate jdbc;
+  @Autowired CannedCatalog catalog;
+  @Autowired ExerciseTicketService exerciseTickets;
+  @MockBean ExerciseGenerationService generation;
 
   private String cookieValue;
 
@@ -56,6 +68,8 @@ class ProseExerciseControllerTest {
     if (!users.existsByUsername(OWNER)) {
       users.save(new UserAccount(OWNER, encoder.encode(PASSWORD), "Ops Chief"));
     }
+    when(generation.generate(anyString(), any(CannedExercise.class)))
+        .thenAnswer(invocation -> invocation.getArgument(1));
     cookieValue = tokens.issue(OWNER);
     jdbc.execute(
         "CREATE TABLE IF NOT EXISTS stage (id BIGINT PRIMARY KEY, name VARCHAR(64), "
@@ -87,6 +101,7 @@ class ProseExerciseControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("A hivatalos iratokat")))
         .andExpect(content().string(containsString("Stage 4")));
+    verify(generation).generate(OWNER, catalog.find(4, "exam-1").orElseThrow());
   }
 
   @Test
@@ -119,7 +134,11 @@ class ProseExerciseControllerTest {
             post("/exercise/4/exam-1/submit")
                 .cookie(session())
                 .param("typedText", typedText)
-                .param("elapsedSeconds", "53"))
+                .param("elapsedSeconds", "53")
+                .param(
+                    "exerciseToken",
+                    exerciseTickets.issue(
+                        OWNER, catalog.find(4, "exam-1").orElseThrow())))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/"));
 

@@ -7,6 +7,23 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
+  ai:
+    azure:
+      openai:
+        api-key: ${AZURE_OPENAI_API_KEY:${AZURE_OPEN_AI_KEY:}}
+        endpoint: ${AZURE_OPENAI_ENDPOINT:${AZURE_OPEN_AI_ENDPOINT:https://localhost}}
+        chat:
+          options:
+            deployment-name: ${AZURE_OPENAI_DEPLOYMENT:${AZURE_OPEN_AI_DEPLOYMENT:}}
 typeshift:
   jwt-secret: ${JWT_SECRET:}
   cookie-secure: ${COOKIE_SECURE:false}
+  ai:
+    azure-endpoint: ${spring.ai.azure.openai.endpoint}
+    azure-api-key: ${spring.ai.azure.openai.api-key}
+    azure-deployment: ${spring.ai.azure.openai.chat.options.deployment-name}
+
+app:
+  chat:
+    model-name: ${spring.ai.azure.openai.chat.options.deployment-name}
+    max-memory-messages: 20

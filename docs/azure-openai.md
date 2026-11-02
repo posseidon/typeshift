@@ -1,10 +1,9 @@
-# Azure OpenAI (prod AI provider)
+# Azure OpenAI configuration
 
-A GPT-4o class deployment is required. Check the Azure OpenAI quota in the
-Azure portal before creating the deployment.
+The application uses Spring AI's Azure OpenAI starter. For local development,
+configure `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, and the exact
+`AZURE_OPENAI_DEPLOYMENT` registered at that endpoint in the ignored `.env` file.
+Production must provide them through its environment or secret manager. A model
+name such as `gpt-4o-mini` is not necessarily the deployment name.
 
-- Endpoint: `AZURE_OPENAI_ENDPOINT`
-- API key: `AZURE_OPENAI_API_KEY`
-- Deployment name: `AZURE_OPENAI_DEPLOYMENT`
-
-All three are read as environment variables and never committed.
+See [Azure AI configuration](azure-ai.md) for deployment details.

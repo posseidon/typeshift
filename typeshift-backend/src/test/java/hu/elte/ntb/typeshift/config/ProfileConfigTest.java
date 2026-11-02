@@ -15,14 +15,28 @@ class ProfileConfigTest {
   }
 
   @Test
-  void devProfilePointsAtLocalPostgresAndOllama() throws IOException {
+  void azureAiConfigurationIsSharedByAllProfiles() throws IOException {
+    PropertySource<?> shared = load("application", "application.yml");
     PropertySource<?> dev = load("application-dev", "application-dev.yml");
 
+    assertThat(shared.getProperty("spring.ai.azure.openai.endpoint"))
+        .isEqualTo("${AZURE_OPENAI_ENDPOINT:${AZURE_OPEN_AI_ENDPOINT:https://localhost}}");
+    assertThat(shared.getProperty("spring.ai.azure.openai.api-key"))
+        .isEqualTo("${AZURE_OPENAI_API_KEY:${AZURE_OPEN_AI_KEY:}}");
+    assertThat(shared.getProperty("spring.ai.azure.openai.chat.options.deployment-name"))
+        .isEqualTo("${AZURE_OPENAI_DEPLOYMENT:${AZURE_OPEN_AI_DEPLOYMENT:}}");
+    assertThat(shared.getProperty("typeshift.ai.azure-endpoint"))
+        .isEqualTo("${spring.ai.azure.openai.endpoint}");
+    assertThat(shared.getProperty("typeshift.ai.azure-api-key"))
+        .isEqualTo("${spring.ai.azure.openai.api-key}");
+    assertThat(shared.getProperty("typeshift.ai.azure-deployment"))
+        .isEqualTo("${spring.ai.azure.openai.chat.options.deployment-name}");
+    assertThat(shared.getProperty("app.chat.model-name"))
+        .isEqualTo("${spring.ai.azure.openai.chat.options.deployment-name}");
+    assertThat(dev.getProperty("spring.config.import"))
+        .isEqualTo("optional:file:../.env[.properties]");
     assertThat(dev.getProperty("spring.datasource.url"))
-        .isEqualTo("jdbc:postgresql://127.0.0.1:5432/typeshift");
-    assertThat(dev.getProperty("typeshift.ai.ollama-base-url"))
-        .isEqualTo("${OLLAMA_BASE_URL:http://localhost:11434}");
-    assertThat(dev.getProperty("typeshift.ai.ollama-model")).isEqualTo("${OLLAMA_MODEL:qwen2.5:14b}");
+        .isEqualTo("${DEV_DATABASE_URL}");
   }
 
   @Test

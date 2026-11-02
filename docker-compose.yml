@@ -1,12 +1,12 @@
-# Local PostgreSQL for TypeShift dev.
+# Local PostgreSQL for TypeShift dev. Compose reads the root .env for interpolation.
 # Start: docker compose up -d    Stop: docker compose down    Wipe data: docker compose down -v
 services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-typeshift}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password!}
-      POSTGRES_DB: ${POSTGRES_DB:-typeshift}
+      POSTGRES_USER: "${POSTGRES_USER:?Set POSTGRES_USER in .env}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+      POSTGRES_DB: "${POSTGRES_DB:?Set POSTGRES_DB in .env}"
     ports:
       - "127.0.0.1:5432:5432"
     volumes:

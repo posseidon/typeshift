@@ -2,10 +2,11 @@ package hu.elte.ntb.typeshift.health.controller;
 
 import hu.elte.ntb.typeshift.config.AiProperties;
 import hu.elte.ntb.typeshift.health.model.ProviderConnectivityStatus;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClient;
 
 /**
  * On-demand AI provider connectivity check. Dev-profile-only: prod has a single
@@ -15,12 +16,12 @@ import org.springframework.web.client.RestClient;
 @Profile("dev")
 public class ProviderConnectivityController {
 
-  private final RestClient client;
+  private final ChatModel chatModel;
   private final String baseUrl;
 
-  public ProviderConnectivityController(RestClient.Builder builder, AiProperties props) {
-    this.client = builder.build();
-    this.baseUrl = props.ollamaBaseUrl();
+  public ProviderConnectivityController(ChatModel chatModel, AiProperties props) {
+    this.chatModel = chatModel;
+    this.baseUrl = props.azureEndpoint();
   }
 
   /**
@@ -31,7 +32,7 @@ public class ProviderConnectivityController {
   @GetMapping("/api/admin/provider-connectivity")
   public ProviderConnectivityStatus connectivity() {
     try {
-      client.get().uri(baseUrl + "/api/tags").retrieve().toBodilessEntity();
+      chatModel.call(new Prompt("Reply with OK."));
       return new ProviderConnectivityStatus(true, baseUrl);
     } catch (RuntimeException e) {
       return new ProviderConnectivityStatus(false, baseUrl);

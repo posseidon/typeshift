@@ -3041,8 +3041,8 @@ Expected: PASS.
 - [ ] **Step 2: Manual smoke (dev box)**
 
 ```bash
-export JWT_SECRET="some-dev-secret-at-least-32-chars-flat"
-mvn -f typeshift-backend/pom.xml spring-boot:run
+# Set JWT_SECRET in the ignored repository .env file.
+mvn -f typeshift-backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 Then in a browser: open `http://localhost:8080` → redirected to `/login`; signup a user incl. optional display name; login; land on `/`; check `/profile` fields; change display name; change password; logout; confirm the old token no longer grants `/`. Cookie in devtools: `typeshift_token`, HttpOnly, SameSite=Lax.

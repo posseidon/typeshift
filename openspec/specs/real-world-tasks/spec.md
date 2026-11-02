@@ -4,7 +4,7 @@
 
 Provide randomised workplace-style typing tasks for Stage 5, drawn from four real-world formats and sequenced for graduation. (Epic 6.)
 
-> **Implementation status: mostly PLANNED.** The four task types exist as an enum and as static canned exemplars, but random selection, the graduation sequence, and server-side scoring are not implemented.
+> **Implementation status: partial.** Azure generation now selects a random Stage 5 task type while avoiding the last served type and routes the matching prompt. Graduation sequencing and per-task graduation scoring remain planned.
 
 ## Requirements
 
@@ -24,7 +24,7 @@ Task selection SHALL be uniform random, excluding the type used on the previous 
 - **WHEN** a Stage 5 sub-exam is requested after a previous attempt
 - **THEN** the selected task type differs from the previous attempt's type
 
-> **Status: PLANNED** — Stage 5 is currently served via fixed routes with no random selection.
+> **Status: IMPLEMENTED** — `ExerciseGenerationService` selects a task type at random, excludes the latest served type, and passes the selection to the Azure prompt router.
 
 ### Requirement: Graduation three-task sequence
 Graduation SHALL draw three distinct task types without repeats, present them one at a time in order, score each separately (one score record per task), end the graduation attempt as FAILED if any task fails, and show a "task n of 3" progress indicator. A sub-exam is one task; graduation uses three distinct types in one sequence.
@@ -37,7 +37,7 @@ Graduation SHALL draw three distinct task types without repeats, present them on
 - **WHEN** any task in the sequence fails
 - **THEN** the graduation attempt is marked FAILED
 
-> **Status: PLANNED** — Stage 5 graduation is currently a single canned passage labeled "three-task sequence" with no sequence or scoring logic.
+> **Status: PLANNED** — Stage 5 graduation is currently one generated task; the three-task sequence, progress indicator, and graduation-attempt scoring are not part of this change.
 
 ### Requirement: Task format contracts
 Each task type SHALL match its documented format and length bounds, with no markup or code fences in the display text: CHAT_BURST (one-to-three-sentence informal message), EMAIL_REPLY (subject line plus a two-to-four-sentence body), DOCUMENT_PARAGRAPH (one structured business paragraph), CODE_COMMENT (a technical comment for a code block described in words).

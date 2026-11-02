@@ -1,29 +1,40 @@
-# ADR-004: AIContentService interface contract
-Status: Locked
+# ADR-004: AI content generation
 
-**Purpose:** Given a generation request, return one validated exercise. The service knows nothing about users, sessions, or scoring.
+**Status:** Accepted
 
-**Request fields**
-- stageId (1 to 5)
-- examType: SUB_EXAM or GRADUATION
-- focusKeys: up to 5 characters from ADR-012
-- recentContentHashes: last 5 SHA-256 hashes served to this user
-- languageTarget: HUNGARIAN, ENGLISH, or MIXED
-- taskType (Stage 5 only): CHAT_BURST, EMAIL_REPLY, DOCUMENT_PARAGRAPH, CODE_COMMENT
+## Context
 
-**Response fields (envelope shared by all agents)**
-- contentType: PROSE or MATH (TELEX deferred, ADR-005)
-- displayText: text the user types
-- expectedAnswer: PROSE = displayText; MATH = numeric result as a decimal string
-- contentHash: SHA-256 of displayText
-- estimatedDurationSeconds
+Typing exercises need stage-specific prose, task formats, and arithmetic. Generated exercises are served per request and exercise text is not persisted.
 
-**Validation (runs before the exercise is served)**
-- PROSE: displayText non-empty, within stage length bounds, contains each focus key at least once where possible.
-- MATH: expectedAnswer is recomputed in Java with BigDecimal. Mismatch means the exercise is rejected.
-- ALL: contentHash not in recentContentHashes. A duplicate is rejected and regenerated, up to 3 attempts.
-- Any failure after 3 attempts is an AI error (ADR-017).
+## Request contract
 
-**Provider abstraction:** Interface with two implementations: AzureOpenAIContentService (prod) and OllamaContentService (dev). A Spring profile selects one. Both return the same envelope.
+The request contains:
 
-**Note:** Exercises are not persisted (ADR-015).
+- `stageId` and `examType`
+- `subExamNumber` for sub-exams
+- up to five `focusKeys`
+- the user's last five `recentContentHashes`
+- `languageTarget`
+- a Stage 5 `taskType` when applicable
+
+The response contains:
+
+- `contentType` (`PROSE` or `MATH`)
+- `displayText` and `expectedAnswer`
+- `estimatedDurationSeconds`
+
+`PROSE` uses `displayText` as `expectedAnswer`. `MATH` uses a decimal result recomputed by the application.
+The application, not the model, computes the SHA-256 content hash from `displayText`.
+
+## Decision
+
+One `AzureOpenAIContentService` selects a stage-native prompt and sends it through Spring AI's configured Azure OpenAI `ChatModel`. The starter uses the endpoint, API key, and deployment configured by `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, and `AZURE_OPENAI_DEPLOYMENT`. Application code does not construct provider REST requests. No runtime provider selection is used.
+
+The service returns the request/response contract above and wraps provider failures in `AiProviderException`, retaining the original cause. Exercises are not persisted; the application retains only per-user content hashes for deduplication.
+
+## Validation
+
+- Prose must be non-empty, within the configured exercise length bound, and include requested focus keys.
+- Math is reparsed and recomputed with Java `BigDecimal`; a mismatch rejects the exercise.
+- Content hashes must not match any of the user's five most recently served hashes.
+- Each exercise makes exactly one model call. Invalid or duplicate output raises an AI error without automatic regeneration.
