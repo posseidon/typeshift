@@ -35,6 +35,8 @@ public class GeminiContentService {
 
   private String requestContent(AiRequest request) {
     return chatModel
+        .prompt()
+        .
         .call(AiPromptFactory.create(request))
         .getResult()
         .getOutput()

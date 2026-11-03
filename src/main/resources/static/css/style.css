@@ -1,0 +1,628 @@
+/* TypeShift ClearKey Clarity design system — vanilla CSS.
+ * Applied from stitch_minimalist_ai_typing_tutor/ (DESIGN.md + Stitch screens):
+ * calm warm-minimalist look — off-white canvas, white cards, rounded corners,
+ * soft ambient shadows, Plus Jakarta Sans headlines, Inter body/labels. */
+
+:root {
+  /* Canvas and surfaces */
+  --bg: #f7f9fb;
+  --card: #ffffff;
+  --surface-low: #f2f4f6;
+  --surface: #eceef0;
+  --surface-high: #e6e8ea;
+  --surface-variant: #e0e3e5;
+  /* Painting and text */
+  --ink: #191c1e;
+  --muted: #424754;
+  --outline: #c2c6d6;
+  /* Accents */
+  --primary: #0058be;
+  --primary-ct: #2170e4;
+  --primary-tint: #d8e2ff;
+  --success: #006947;
+  --success-ct: #00855b;
+  --error: #ba1a1a;
+  --error-tint: #ffdad6;
+  /* Type */
+  --font-ui: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  /* Spacing */
+  --gutter: 1.5rem;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  /* Shape and elevation: soft ambient shadow, never an offset stamp */
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1.5rem;
+  --shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.06), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
+  --shadow-lift: 0 4px 12px -2px rgba(15, 23, 42, 0.1), 0 12px 24px -4px rgba(15, 23, 42, 0.06);
+  --focus: 3px solid var(--primary);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; }
+
+a { color: var(--primary); text-decoration-thickness: 1px; }
+
+a:focus-visible {
+  outline: var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs, 4px);
+}
+
+/* ---- Shared shell ---------------------------------------------------- */
+
+.topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--card);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.brand-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  background: var(--primary);
+}
+
+.brand-tile svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-copy { display: flex; flex-direction: column; }
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.brand-sub {
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--secondary, #505f76);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.topnav-links {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.topnav .nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius);
+  color: var(--muted);
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.topnav .nav-icon:hover { background: var(--surface); color: var(--ink); }
+
+.topnav .nav-icon:focus-visible { outline: var(--focus); outline-offset: 2px; }
+
+.nav-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.language-picker { display: flex; align-items: center; }
+
+.language-picker select {
+  border: 1px solid var(--outline);
+  border-radius: var(--radius);
+  padding: 0.45rem 0.6rem;
+  background: var(--card);
+  color: var(--ink);
+  font: 500 0.875rem var(--font-ui);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.language-picker select:focus-visible {
+  outline: var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---- Page canvas ------------------------------------------------------ */
+
+.page {
+  max-width: 1140px;
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--space-xl) var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* ---- Typographic roles ------------------------------------------------ */
+
+.label-caps {
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.headline-xl {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 3.25rem;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.headline-md {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.body-lg {
+  font-family: var(--font-ui);
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+/* ---- Page header ------------------------------------------------------- */
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-bottom: var(--space-md);
+}
+
+.page-head p { margin: var(--space-xs) 0 0; color: var(--muted); }
+
+/* ---- Stage tags (dark pills) ------------------------------------------- */
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.tag-ink { background: var(--ink); color: var(--bg); }
+
+/* ---- Buttons ------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.6rem 1.25rem;
+  min-height: 44px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 150ms ease, box-shadow 150ms ease;
+}
+
+.btn:focus-visible { outline: var(--focus); outline-offset: 2px; }
+
+.btn-ghost {
+  background: var(--surface-low);
+  color: var(--ink);
+}
+
+.btn-ghost:hover { background: var(--surface); }
+
+.btn-ghost:active { transform: translateY(1px); }
+
+/* ---- Notices ------------------------------------------------------------- */
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  background: var(--card);
+  border: 1px solid var(--outline);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.notice .close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 999px;
+  width: 2rem;
+  height: 2rem;
+}
+
+.notice .close:hover { background: var(--surface); }
+
+/* ---- Progress gauge -------------------------------------------------------- */
+
+.gauge { position: relative; height: 0.75rem; background: var(--surface-high); border-radius: 999px; }
+
+.gauge-fill { height: 100%; background: var(--primary); border-radius: 999px; transition: width 700ms ease; }
+
+.gauge-marker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: 95%;
+  width: 2px;
+  background: var(--primary-ct);
+}
+
+/* ---- Stage-map station cards ------------------------------------------------ */
+
+.stn {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 200ms ease;
+}
+
+.stn:hover { box-shadow: var(--shadow-lift); }
+
+.stn-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  background: var(--surface-high);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.stn-head .id { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
+
+.stn-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  flex: 1;
+}
+
+/* ---- Exercise screen ---------------------------------------------------------- */
+
+.readout-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--card);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  padding: var(--space-sm) 0;
+}
+
+.readout-row {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.readouts { display: flex; flex-wrap: wrap; gap: var(--space-md); }
+
+.readout {
+  background: var(--surface-low);
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-md);
+  min-width: 96px;
+}
+
+.readout .val {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.readout .unit {
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  color: var(--secondary, #505f76);
+}
+
+.shift-state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--ink);
+  color: var(--bg);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 999px;
+}
+
+.readout-gauge { min-width: 200px; flex: 1; }
+
+.docket {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--space-lg);
+}
+
+.docket-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid var(--outline);
+}
+
+.docket-foot {
+  border-top: 1px solid var(--outline);
+  padding-top: var(--space-md);
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+}
+
+.type-card { min-height: 460px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+
+.type-pane {
+  font-family: var(--font-ui);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 2;
+  letter-spacing: 0.15em;
+  cursor: text;
+  word-break: break-word;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  margin: 0;
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
+
+/* ---- Typing feedback states (contract with engine.js) ------------------------ */
+
+.ch-ok {
+  color: var(--ink);
+  border-bottom: 2px solid var(--success);
+}
+
+.ch-bad {
+  color: var(--error);
+  background: rgba(255, 218, 214, 0.4);
+  border-bottom: 2px solid var(--error);
+}
+
+.ch-todo { color: rgba(66, 71, 84, 0.4); }
+
+.cursor-block {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.15em;
+  background: var(--primary);
+  vertical-align: middle;
+  animation: cursor-blink 1s infinite;
+}
+
+@keyframes cursor-blink { 50% { opacity: 0; } }
+
+#practice-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- Numpad capture (Stage 3) ------------------------------------------------- */
+
+.pad-block { display: flex; flex-direction: column; gap: var(--space-md); }
+
+.pad-value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  min-height: 3rem;
+  padding: var(--space-xs) var(--space-md);
+  border-bottom: 2px solid var(--outline);
+  background: var(--surface-low);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.pad-value:empty::after { content: "—"; color: var(--muted); }
+
+#math-verdict {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius);
+  border: 1px solid var(--outline);
+}
+
+#math-verdict.verdict-ok {
+  color: var(--success);
+  border-color: var(--success);
+  background: var(--surface-low);
+}
+
+#math-verdict.verdict-bad {
+  color: var(--error);
+  border-color: var(--error);
+  background: var(--error-tint);
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-sm);
+  max-width: 34rem;
+}
+
+.keypad button {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface-low);
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--space-sm) 0;
+  min-height: 44px;
+  cursor: pointer;
+  transition: background 150ms ease, transform 100ms ease;
+}
+
+.keypad button:hover { background: var(--surface); }
+
+.keypad button:active { transform: scale(0.97); background: var(--surface-high); }
+
+.keypad button:focus-visible { outline: var(--focus); outline-offset: 2px; }
+
+.kbd {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--surface-low);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-sm, 4px);
+  padding: 0.1rem 0.35rem;
+}
+
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.key-hints { display: flex; flex-wrap: wrap; gap: var(--space-md); color: var(--muted); }
+
+/* ---- Stage 5 task-type variants ------------------------------------------------ */
+
+/* Chat burst: one uniform indent and tint, so authored "- <name>: ..." lines
+   all read as messages and wrapped continuations stay with their line. */
+.docket--chat-burst #prose-display {
+  font-size: 1.25rem;
+  letter-spacing: 0.05em;
+  background: var(--surface-low);
+  padding: var(--space-md) var(--space-md) var(--space-md) calc(var(--space-md) + 1.5em);
+}
+
+/* Email reply: a serif sheet behind a primary margin rule; the header line
+   (Tárgy: ...) is authored content, not parsed. */
+.docket--email-reply #prose-display {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.05em;
+  border-left: 4px solid var(--primary);
+}
+
+/* Document paragraph: narrow read-measure sheet; graduation (taskClass null)
+   keeps the baseline. */
+.docket--document-paragraph #prose-display { max-width: 65ch; }
+
+/* Code comment: monospace lines on a tinted sheet; wrapping untouched.
+   The "//" prefixes are authored content, not markup. */
+.docket--code-comment #prose-display {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 1.25rem;
+  letter-spacing: 0.05em;
+  background: var(--surface-low);
+}
+
+/* ---- Responsive ----------------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .page { padding: var(--space-lg) var(--space-md); }
+  .topnav { padding: var(--space-sm) var(--space-md); flex-wrap: wrap; }
+  .headline-xl { font-size: 1.875rem; line-height: 2.5rem; }
+  .type-pane { font-size: 1.5rem; }
+}
