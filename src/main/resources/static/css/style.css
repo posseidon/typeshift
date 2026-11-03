@@ -662,7 +662,20 @@ a:focus-visible {
   background: var(--surface-low);
 }
 
-/* ---- Responsive ----------------------------------------------------------------- */
+/* ---- Responsive ------------------------------------------------------------------ */
+
+/* Stage grid: two stations per row on desktop, stacked on small screens. */
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .stage-grid { grid-template-columns: 1fr; }
+  .readout-row { gap: var(--space-sm); }
+}
 
 @media (max-width: 600px) {
   .page { padding: var(--space-lg) var(--space-md); }

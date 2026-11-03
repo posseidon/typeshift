@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="#{title.stageMap}">TypeShift — Stage Map</title>
+</head>
+<body>
+  <section th:fragment="content">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h1 class="headline-xl" th:text="#{stageMap.heading}">Official Stage Map</h1>
+          <p class="body-lg" th:text="#{stageMap.subtitle}">Typing proficiency learning path</p>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <section class="stn" th:each="stageId : ${stageIds}">
+          <div class="stn-head">
+            <div class="id">
+              <span class="tag tag-ink" th:text="|#{common.stage} ${#numbers.formatInteger(stageId, 2)}|">STAGE 01</span>
+              <span class="headline-md" th:text="${stageNames[__${stageId}__]}">Stage name</span>
+            </div>
+          </div>
+          <div class="stn-body" style="display:flex; flex-direction:column; gap:var(--space-xs)">
+            <span class="label-caps" style="color:var(--muted)" th:text="#{stageMap.practiceDockets}">Practice exercises</span>
+            <a class="label-caps" th:each="exercise : ${exercisesByStage[__${stageId}__]}"
+               th:href="@{/exercise/{stageId}/{examKey}(stageId=${stageId},examKey=${exercise.examKey})}"
+               th:text="${exercise.label}">Exercise</a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
