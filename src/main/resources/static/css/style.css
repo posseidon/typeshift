@@ -360,6 +360,30 @@ a:focus-visible {
   flex: 1;
 }
 
+/* Docket index rows: quiet list, primary title, underline reveal on hover. */
+.stn-body > .label-caps { color: var(--secondary, #505f76); }
+
+.stn-body a.label-caps {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  color: var(--primary);
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  transition: background 150ms ease;
+}
+
+.stn-body a.label-caps:hover {
+  background: var(--surface-low);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.stn-body a.label-caps:focus-visible { outline: var(--focus); outline-offset: 2px; }
+
 /* ---- Exercise screen ---------------------------------------------------------- */
 
 .readout-bar {
