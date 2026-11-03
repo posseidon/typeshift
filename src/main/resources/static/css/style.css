@@ -274,14 +274,12 @@ a:focus-visible {
 
 .btn:focus-visible { outline: var(--focus); outline-offset: 2px; }
 
-.btn-ghost {
-  background: var(--surface-low);
-  color: var(--ink);
-}
+/* Base tone also covers plain .btn elements created inside scripts (retry card). */
+.btn { background: var(--surface-low); color: var(--ink); }
 
-.btn-ghost:hover { background: var(--surface); }
+.btn:hover { background: var(--surface); }
 
-.btn-ghost:active { transform: translateY(1px); }
+.btn:active { transform: translateY(1px); }
 
 /* ---- Notices ------------------------------------------------------------- */
 
@@ -310,6 +308,28 @@ a:focus-visible {
 }
 
 .notice .close:hover { background: var(--surface); }
+
+.notice-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--surface-low);
+  color: var(--primary);
+  border-radius: var(--radius);
+}
+
+.notice-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
 /* ---- Progress gauge -------------------------------------------------------- */
 

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="#{title.exercise}">TypeShift — Prose Exercise</title>
+</head>
+<body>
+  <section th:fragment="content">
+    <!-- Top bureau metric ledger strip (sticky readout) -->
+    <aside class="readout-bar" th:attr="aria-label=#{exercise.metrics}">
+      <div class="readout-row">
+        <div class="readouts">
+          <div class="readout">
+            <span class="label-caps" style="color: var(--muted)" th:text="#{exercise.speed}">Speed</span>
+            <div><span class="val" id="live-wpm">0</span> <span class="unit">WPM</span></div>
+          </div>
+          <div class="readout">
+            <span class="label-caps" style="color: var(--muted)" th:text="#{exercise.precision}">Precision</span>
+            <div><span class="val" id="live-acc" style="color: var(--green)">100.0</span> <span class="unit">%</span></div>
+          </div>
+          <div class="readout">
+            <span class="label-caps" style="color: var(--muted)" th:text="#{exercise.elapsed}">Elapsed</span>
+            <div><span class="val" id="live-timer">00:00</span></div>
+          </div>
+          <div class="readout-gauge">
+            <div class="label-caps" style="display:flex; justify-content:space-between; margin-bottom:4px">
+              <span style="color: var(--muted)"><span th:text="#{exercise.quota}">Progress</span> (<span id="gauge-label">0%</span>)</span>
+              <span style="color: #5f4100" th:text="#{exercise.required}">Required: 95.0%</span>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill" id="gauge-bar" style="width: 0%"></div>
+              <div class="gauge-marker" title="Minimum audit certification threshold (95%)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="shift-state label-caps" th:text="#{exercise.shiftState(${stageId})}">Practice in progress</div>
+      </div>
+    </aside>
+
+    <div class="page">
+      <!-- Standard notice 14-HU: one-time keyboard reminder (story 5.8) -->
+      <div class="notice" id="keyboard-banner" th:attr="aria-label=#{exercise.keyboardNotice}">
+        <div style="display:flex; gap: var(--space-sm); align-items:flex-start">
+          <span class="notice-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <rect x="3" y="6" width="18" height="12" rx="2"/>
+              <path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M8 15.5h8"/>
+            </svg>
+          </span>
+          <div>
+            <span class="label-caps"><strong th:text="#{exercise.keyboardNotice}">Keyboard layout reminder</strong></span>
+            <span th:text="#{exercise.keyboardNoticeText}">Check that your keyboard is set to Hungarian QWERTZ for this exercise.</span>
+          </div>
+        </div>
+        <button class="close" type="button" th:attr="aria-label=#{common.dismiss}"
+                onclick="document.getElementById('keyboard-banner').style.display='none'">×</button>
+      </div>
+
+      <!-- Async docket loader: the shell renders instantly; htmx fetches the generated docket so LLM latency never blocks the page. -->
+      <div id="exercise-loading" class="docket type-card"
+           th:attr="hx-get=@{/exercise/{stageId}/{examKey}/docket(stageId=${stageId},examKey=${examKey})},
+                    data-failed=#{exercise.generationFailed},
+                    data-retry=#{exercise.retry}"
+           hx-trigger="load" hx-target="this" hx-swap="outerHTML">
+        <p class="label-caps" th:text="#{exercise.generating}">Generating exercise…</p>
+      </div>
+    </div>
+
+    <!-- Provider outages surface on the docket request; keep the shell visible and offer a retry. -->
+    <script>
+      document.addEventListener('htmx:beforeSwap', function (event) {
+        var placeholder = event.detail.target;
+        if (event.detail.xhr.status < 400 || !placeholder || placeholder.id !== 'exercise-loading') {
+          return;
+        }
+        event.detail.shouldSwap = false;
+
+        var errorCard = document.createElement('div');
+        errorCard.id = 'exercise-loading';
+        errorCard.className = 'docket type-card';
+        errorCard.setAttribute('role', 'alert');
+        errorCard.setAttribute('data-failed', placeholder.getAttribute('data-failed'));
+        errorCard.setAttribute('data-retry', placeholder.getAttribute('data-retry'));
+        errorCard.setAttribute('hx-get', placeholder.getAttribute('hx-get'));
+        var message = document.createElement('p');
+        message.className = 'label-caps';
+        message.textContent = errorCard.getAttribute('data-failed');
+        var retry = document.createElement('button');
+        retry.className = 'btn';
+        retry.type = 'button';
+        retry.textContent = errorCard.getAttribute('data-retry');
+        retry.setAttribute('hx-get', errorCard.getAttribute('hx-get'));
+        retry.setAttribute('hx-trigger', 'click');
+        retry.setAttribute('hx-target', '#exercise-loading');
+        retry.setAttribute('hx-swap', 'outerHTML');
+        errorCard.append(message, retry);
+        placeholder.replaceWith(errorCard);
+        window.htmx.process(errorCard);
+      });
+    </script>
+  </section>
+
+  <!-- Generated docket fragment: served on GET /exercise/{stageId}/{examKey}/docket -->
+  <div th:fragment="docket">
+    <!-- Standard notice 15-NU: keypad lock reminder, numeric dockets only (ADR-006) -->
+    <div class="notice" id="numlock-banner" th:if="${dataMode == 'numeric'}" th:attr="aria-label=#{exercise.numLockNotice}">
+      <div style="display:flex; gap: var(--space-sm); align-items:flex-start">
+        <span class="notice-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <rect x="4" y="4" width="6" height="6" rx="1"/>
+            <rect x="14" y="4" width="6" height="6" rx="1"/>
+            <rect x="4" y="14" width="6" height="6" rx="1"/>
+            <rect x="14" y="14" width="6" height="6" rx="1"/>
+          </svg>
+        </span>
+        <div>
+          <span class="label-caps"><strong th:text="#{exercise.numLockNotice}">NumLock reminder</strong></span>
+          <span th:text="#{exercise.numLockText}">Check NumLock before entering numbers.</span>
+        </div>
+      </div>
+      <button class="close" type="button" th:attr="aria-label=#{common.dismiss}"
+              onclick="document.getElementById('numlock-banner').style.display='none'">×</button>
+    </div>
+
+    <!-- Main exercise docket -->
+    <div id="typing-docket" class="docket type-card"
+         th:attr="data-target=${dataTarget},data-mode=${dataMode},data-expected=${dataExpected}"
+         th:classappend="${taskClass != null ? ' docket--' + taskClass : ''}">
+      <div class="docket-head">
+        <button class="btn btn-ghost" type="button" onclick="window.location.reload()">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+               style="width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+            <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"/>
+            <path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"/>
+          </svg>
+          <span th:text="#{exercise.newCopy}">New exercise</span>
+        </button>
+        <form method="get" action="/stage-map">
+          <button class="btn btn-ghost" type="submit" th:text="#{exercise.stageMapReturn}">Return to stage map</button>
+        </form>
+      </div>
+      <div id="typing-container">
+        <p class="type-pane" id="prose-display" aria-live="off" style="white-space: pre-line"
+           th:text="${dataMode == 'numeric' ? dataTarget : ''}"></p>
+        <div class="pad-block" th:if="${dataMode == 'numeric'}">
+          <div id="practice-pad" class="pad-value" contenteditable="false" aria-live="polite"></div>
+          <div id="math-verdict" role="status" hidden></div>
+          <!-- Keypad dispatches typepad CustomEvents; the engine owns capture (ADR-006). -->
+          <div id="keypad" class="keypad">
+            <button type="button" data-code="Numpad7">7</button>
+            <button type="button" data-code="Numpad8">8</button>
+            <button type="button" data-code="Numpad9">9</button>
+            <button type="button" data-code="NumpadDivide">÷</button>
+            <button type="button" data-code="NumpadMultiply">×</button>
+            <button type="button" data-code="Numpad4">4</button>
+            <button type="button" data-code="Numpad5">5</button>
+            <button type="button" data-code="Numpad6">6</button>
+            <button type="button" data-code="NumpadSubtract">−</button>
+            <button type="button" data-code="NumpadAdd">+</button>
+            <button type="button" data-code="Numpad1">1</button>
+            <button type="button" data-code="Numpad2">2</button>
+            <button type="button" data-code="Numpad3">3</button>
+            <button type="button" data-code="NumpadDecimal">,</button>
+            <button type="button" data-code="NumpadEnter">⏎</button>
+            <button type="button" data-code="Numpad0">0</button>
+          </div>
+        </div>
+        <textarea th:unless="${dataMode == 'numeric'}" id="practice-input"
+                  th:attr="aria-label=#{exercise.inputLabel}"
+                  autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      </div>
+      <div class="docket-foot label-caps">
+        <div style="display:flex; gap: var(--space-md); flex-wrap:wrap">
+          <span th:text="#{exercise.batch}">Exercise</span>
+          <span><span th:text="${dataMode == 'numeric' ? #messages.msg('exercise.missed') : #messages.msg('exercise.keyRetries')}">Key retries</span>:
+            <span id="retry-count">00</span></span>
+          <span><span th:text="#{exercise.grossCharacters}">Characters typed</span>: <span id="gross-count">0</span></span>
+        </div>
+        <span th:text="#{exercise.carriage}">Input capture active</span>
+      </div>
+    </div>
+
+    <!-- Terminal control footer -->
+    <div class="controls-row">
+      <div class="key-hints label-caps">
+        <span><span class="kbd">ESC</span> <span th:text="#{exercise.pause}">Pause / leave</span></span>
+        <span><span class="kbd">TAB</span> <span th:text="#{exercise.restart}">Restart exercise</span></span>
+        <span><span class="kbd">ENTER</span> <span th:text="#{exercise.finish}">Finish</span></span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
