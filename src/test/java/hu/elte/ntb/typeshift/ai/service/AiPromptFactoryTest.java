@@ -251,51 +251,26 @@ class AiPromptFactoryTest {
         for (int subExam = 1; subExam <= subExamCounts[stage - 1]; subExam++) {
           TaskType taskType = (stage == 5) ? TaskType.CHAT_BURST : null;
           String prompt = promptForLanguage(stage, ExamType.SUB_EXAM, subExam, taskType, target);
-          assertThat(prompt)
-              .as("stage %s exam-%s %s prompt", stage, subExam, target)
-              .doesNotContain("{language}")
-              .doesNotContain("{keyboardLayout}")
-              .doesNotContain("{layoutRule}")
-              .doesNotContain("{homeRowKeys}")
-              .doesNotContain("{topRowKeys}")
-              .doesNotContain("{bottomRowKeys}")
-              .doesNotContain("{diacriticRule}")
-              .doesNotContain("{emailSubjectLabel}");
+          assertNoPlaceholders(prompt, "stage %s exam-%s %s prompt".formatted(stage, subExam, target));
         }
         TaskType gradTaskType = (stage == 5) ? TaskType.EMAIL_REPLY : null;
         String gradPrompt = promptForLanguage(stage, ExamType.GRADUATION, 0, gradTaskType, target);
-        assertThat(gradPrompt)
-            .as("stage %s graduation %s prompt", stage, target)
-            .doesNotContain("{language}")
-            .doesNotContain("{keyboardLayout}")
-            .doesNotContain("{layoutRule}")
-            .doesNotContain("{homeRowKeys}")
-            .doesNotContain("{topRowKeys}")
-            .doesNotContain("{bottomRowKeys}")
-            .doesNotContain("{diacriticRule}")
-            .doesNotContain("{emailSubjectLabel}");
+        assertNoPlaceholders(gradPrompt, "stage %s graduation %s prompt".formatted(stage, target));
       }
       
       // Test all stage 5 task prompts
-      String chatPrompt = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.CHAT_BURST, target);
-      assertThat(chatPrompt)
-          .as("stage 5 CHAT_BURST %s prompt", target)
-          .doesNotContainPattern("\\{[a-zA-Z]+\\}");
-      
-      String emailPrompt = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.EMAIL_REPLY, target);
-      assertThat(emailPrompt)
-          .as("stage 5 EMAIL_REPLY %s prompt", target)
-          .doesNotContainPattern("\\{[a-zA-Z]+\\}");
-      
-      String docPrompt = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.DOCUMENT_PARAGRAPH, target);
-      assertThat(docPrompt)
-          .as("stage 5 DOCUMENT_PARAGRAPH %s prompt", target)
-          .doesNotContainPattern("\\{[a-zA-Z]+\\}");
-      
-      String codePrompt = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.CODE_COMMENT, target);
-      assertThat(codePrompt)
-          .as("stage 5 CODE_COMMENT %s prompt", target)
-          .doesNotContainPattern("\\{[a-zA-Z]+\\}");
+      assertNoPlaceholders(
+          promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.CHAT_BURST, target),
+          "stage 5 CHAT_BURST %s prompt".formatted(target));
+      assertNoPlaceholders(
+          promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.EMAIL_REPLY, target),
+          "stage 5 EMAIL_REPLY %s prompt".formatted(target));
+      assertNoPlaceholders(
+          promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.DOCUMENT_PARAGRAPH, target),
+          "stage 5 DOCUMENT_PARAGRAPH %s prompt".formatted(target));
+      assertNoPlaceholders(
+          promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.CODE_COMMENT, target),
+          "stage 5 CODE_COMMENT %s prompt".formatted(target));
     }
   }
 
@@ -333,6 +308,19 @@ class AiPromptFactoryTest {
         target,
         taskType);
     return AiPromptFactory.create(req);
+  }
+
+  private void assertNoPlaceholders(String prompt, String description) {
+    assertThat(prompt)
+        .as(description)
+        .doesNotContain("{language}")
+        .doesNotContain("{keyboardLayout}")
+        .doesNotContain("{layoutRule}")
+        .doesNotContain("{homeRowKeys}")
+        .doesNotContain("{topRowKeys}")
+        .doesNotContain("{bottomRowKeys}")
+        .doesNotContain("{diacriticRule}")
+        .doesNotContain("{emailSubjectLabel}");
   }
 
   private String prompt(int stage, ExamType examType, int subExamNumber, TaskType taskType) {

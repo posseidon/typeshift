@@ -14,6 +14,12 @@ public final class AiPromptFactory {
   private static final int SUB_EXAM_FORMAT_STAGE = 3;
   private static final int TASK_FORMAT_STAGE = 5;
 
+  // QWERTY keyboard layout constants (used by English and Vietnamese)
+  private static final String QWERTY_HOME_ROW = "a s d f j k l ;";
+  private static final String QWERTY_TOP_ROW = "q w e r t y u i o p [ ]";
+  private static final String QWERTY_BOTTOM_ROW = "z x c v b n m";
+  private static final String NO_LAYOUT_RULE = ""; // omit y/z swap clause for QWERTY layouts
+
   private AiPromptFactory() {}
 
   public static String create(AiRequest request) {
@@ -29,10 +35,10 @@ public final class AiPromptFactory {
       case ENGLISH -> prompt
           .replace("{language}", "English")
           .replace("{keyboardLayout}", "QWERTY")
-          .replace("{layoutRule}", "")
-          .replace("{homeRowKeys}", "a s d f j k l ;")
-          .replace("{topRowKeys}", "q w e r t y u i o p [ ]")
-          .replace("{bottomRowKeys}", "z x c v b n m")
+          .replace("{layoutRule}", NO_LAYOUT_RULE)
+          .replace("{homeRowKeys}", QWERTY_HOME_ROW)
+          .replace("{topRowKeys}", QWERTY_TOP_ROW)
+          .replace("{bottomRowKeys}", QWERTY_BOTTOM_ROW)
           .replace("{diacriticRule}", "Use natural English without required diacritics")
           .replace("{emailSubjectLabel}", "Subject:");
       case HUNGARIAN -> prompt
@@ -47,10 +53,10 @@ public final class AiPromptFactory {
       case VIETNAMESE -> prompt
           .replace("{language}", "Vietnamese")
           .replace("{keyboardLayout}", "QWERTY")
-          .replace("{layoutRule}", "")
-          .replace("{homeRowKeys}", "a s d f j k l ;")
-          .replace("{topRowKeys}", "q w e r t y u i o p [ ]")
-          .replace("{bottomRowKeys}", "z x c v b n m")
+          .replace("{layoutRule}", NO_LAYOUT_RULE)
+          .replace("{homeRowKeys}", QWERTY_HOME_ROW)
+          .replace("{topRowKeys}", QWERTY_TOP_ROW)
+          .replace("{bottomRowKeys}", QWERTY_BOTTOM_ROW)
           .replace("{diacriticRule}", "ă â đ ê ô ơ ư with natural Vietnamese tone marks")
           .replace("{emailSubjectLabel}", "Chủ đề:");
       case MIXED -> prompt; // No substitutions for MIXED
