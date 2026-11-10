@@ -1,0 +1,14 @@
+spring:
+  config:
+    import: "optional:file:../.env[.properties]"
+
+  # DevTools automatically sets this to false, but explicit is better
+  thymeleaf:
+    cache: false
+    # Read templates directly from the file system instead of the classpath
+    prefix: file:src/main/resources/templates/
+
+  web:
+    resources:
+      # Read static assets (CSS/JS) directly from the file system
+      static-locations: file:src/main/resources/static/

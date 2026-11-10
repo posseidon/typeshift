@@ -8,25 +8,46 @@
     <div class="page">
       <div class="page-head">
         <div>
-          <h1 class="headline-xl" th:text="#{stageMap.heading}">Official Stage Map</h1>
+          <h1 class="headline-xl" th:text="#{stageMap.heading}">Stage Map</h1>
           <p class="body-lg" th:text="#{stageMap.subtitle}">Typing proficiency learning path</p>
         </div>
       </div>
 
       <div class="stage-grid">
-        <section class="stn" th:each="stageId : ${stageIds}">
+        <section class="stn" th:each="stageId : ${stageIds}"
+                 th:with="stageExercises=${exercisesByStage[__${stageId}__]}"
+                 th:classappend="${stageId == 5 ? 'stn--wide' : ''}">
           <div class="stn-head">
             <div class="id">
               <span class="tag tag-ink" th:text="|#{common.stage} ${#numbers.formatInteger(stageId, 2)}|">STAGE 01</span>
-              <span class="headline-md" th:text="${stageNames[__${stageId}__]}">Stage name</span>
+              <h2 class="headline-md" th:text="${stageNames[__${stageId}__]}">Stage name</h2>
             </div>
           </div>
-          <div class="stn-body" style="display:flex; flex-direction:column; gap:var(--space-xs)">
-            <span class="label-caps" style="color:var(--muted)" th:text="#{stageMap.practiceDockets}">Practice exercises</span>
-            <a class="label-caps" th:each="exercise : ${exercisesByStage[__${stageId}__]}"
-               th:href="@{/exercise/{stageId}/{examKey}(stageId=${stageId},examKey=${exercise.examKey})}"
-               th:text="${exercise.label}">Exercise</a>
+          <div class="stn-body">
+            <span class="label-caps" th:text="${stageId == 5 ? #messages.msg('stageMap.workplaceDockets') : #messages.msg('stageMap.practiceDockets')}">Practice dockets</span>
+            <div class="stn-task-grid" th:if="${stageId == 5}">
+              <a class="stn-task" th:each="exercise : ${stageExercises}"
+                 th:href="@{/exercise/{stageId}/{examKey}(stageId=${stageId},examKey=${exercise.examKey})}">
+                <span class="stn-task-title" th:text="${exercise.label}">Workplace task</span>
+                <span class="stn-task-description" th:switch="${exercise.examKey}">
+                  <span th:case="'exam-1'" th:text="#{stageMap.taskChatDescription}">Slack &amp; Teams quick short answers under 40 words.</span>
+                  <span th:case="'exam-2'" th:text="#{stageMap.taskEmailDescription}">Professional workplace acknowledgement and status update.</span>
+                  <span th:case="'exam-3'" th:text="#{stageMap.taskDocumentDescription}">Report excerpts with mixed punctuation and numbers.</span>
+                  <span th:case="'exam-4'" th:text="#{stageMap.taskCodeDescription}">Technical notation, paths, names, and comments.</span>
+                  <span th:case="'grad'" th:text="#{stageMap.taskEnduranceDescription}">Sequenced workplace prompts for full-keyboard endurance.</span>
+                </span>
+              </a>
+            </div>
+            <div class="stn-exercise-list" th:unless="${stageId == 5}">
+              <a class="label-caps" th:each="exercise : ${stageExercises}"
+                 th:href="@{/exercise/{stageId}/{examKey}(stageId=${stageId},examKey=${exercise.examKey})}"
+                 th:text="${exercise.label}">Exercise</a>
+            </div>
           </div>
+          <footer class="stn-footer">
+            <a class="btn" th:href="@{/exercise/{stageId}/{examKey}(stageId=${stageId},examKey=${stageExercises[0].examKey})}"
+               th:text="${stageId == 5 ? #messages.msg('stageMap.enterStagePreview') : #messages.msg('stageMap.enterStage', stageId)}">Enter Stage</a>
+          </footer>
         </section>
       </div>
     </div>

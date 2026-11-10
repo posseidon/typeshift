@@ -179,7 +179,7 @@ CREATE UNIQUE INDEX uk_learning_profile_unlocked_stage
 
 ```java
   @Column(nullable = false)
-  private String keyboardLayout = "HU_QWERTZ";
+  private final String keyboardLayout = "HU_QWERTZ";
 
   @Column(nullable = false)
   private Instant updatedAt;

@@ -629,7 +629,7 @@ class UserAccountServiceTest {
     SignupOutcome outcome = service.createAccount("alice", "long-enough", null);
 
     assertTrue(outcome.created());
-    UserAccount passed = (UserAccount) verifySaved();
+    UserAccount passed = verifySaved();
     verify(learningProfileService).initializeFor(saved);
     assertEquals("encoded", passed.getPasswordHash());
   }
@@ -812,7 +812,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import hu.elte.ntb.typeshift.config.AuthProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -908,7 +907,6 @@ public record AuthProperties(String jwtSecret, boolean cookieSecure) {}
 ```java
 package hu.elte.ntb.typeshift.service;
 
-import hu.elte.ntb.typeshift.config.AuthProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -2183,7 +2181,6 @@ Replace the whole file with:
 ```java
 package hu.elte.ntb.typeshift.controller;
 
-import hu.elte.ntb.typeshift.config.AuthProperties;
 import hu.elte.ntb.typeshift.model.UserAccount;
 import hu.elte.ntb.typeshift.repository.UserAccountRepository;
 import hu.elte.ntb.typeshift.security.AuthCookie;
@@ -2247,7 +2244,8 @@ public class LoginController {
    * @return the layout template name
    */
   @GetMapping("/login")
-  public String login(@RequestParam(value = "auth", required = false) String authFlag, Model model) {
+  public String login(@RequestParam(value = "auth", required = false) String authFlag,
+      Model model) {
     model.addAttribute("title", "TypeShift — Start of Shift");
     model.addAttribute("contentFragment", "login");
     if (authFlag == null) {

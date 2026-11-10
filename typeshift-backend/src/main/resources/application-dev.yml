@@ -1,7 +1,0 @@
-spring:
-  config:
-    import: "optional:file:../.env[.properties]"
-  datasource:
-    url: ${DEV_DATABASE_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
