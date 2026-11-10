@@ -79,6 +79,7 @@ public class ProseExerciseController {
    *
    * @param stageId station identifier
    * @param examKey catalog key within the station
+   * @param locale the resolved session locale
    * @param model the view model
    * @return the docket fragment of the exercise template
    * @throws ResponseStatusException with 404 when the stage and exam pair is unknown
@@ -87,12 +88,13 @@ public class ProseExerciseController {
   public String docket(
       @PathVariable int stageId,
       @PathVariable String examKey,
+      Locale locale,
       Model model) {
     CannedExercise definition =
         catalog
             .find(stageId, examKey)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    CannedExercise exercise = generation.generate(definition);
+    CannedExercise exercise = generation.generate(definition, locale);
     model.addAttribute("docketLabel", docketLabel(exercise));
     model.addAttribute("docketFraming", framing(exercise));
     model.addAttribute("dataTarget", exercise.displayText());

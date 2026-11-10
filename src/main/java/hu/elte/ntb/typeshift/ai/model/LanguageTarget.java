@@ -4,5 +4,6 @@ package hu.elte.ntb.typeshift.ai.model;
 public enum LanguageTarget {
   HUNGARIAN,
   ENGLISH,
+  VIETNAMESE,
   MIXED
 }

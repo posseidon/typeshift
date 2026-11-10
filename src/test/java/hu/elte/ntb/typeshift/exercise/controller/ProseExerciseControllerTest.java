@@ -1,9 +1,11 @@
 package hu.elte.ntb.typeshift.exercise.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -12,13 +14,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hu.elte.ntb.typeshift.ai.model.AiRequest;
 import hu.elte.ntb.typeshift.ai.model.AiResponse;
+import hu.elte.ntb.typeshift.ai.model.LanguageTarget;
 import hu.elte.ntb.typeshift.ai.service.AiProviderException;
 import hu.elte.ntb.typeshift.ai.service.GeminiContentService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(properties = "spring.ai.google.genai.api-key=test-key")
@@ -120,5 +125,24 @@ class ProseExerciseControllerTest {
   @Test
   void legacyExerciseRouteIsNotFound() throws Exception {
     mvc.perform(get("/exercise")).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void docketUsesSessionLocaleForGeneratedContent() throws Exception {
+    when(ai.generate(any(AiRequest.class))).thenReturn(new AiResponse("Practice text."));
+
+    MockHttpSession session =
+        (MockHttpSession) mvc.perform(get("/exercise/4/exam-1").param("lang", "en"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getRequest()
+            .getSession();
+
+    mvc.perform(get("/exercise/4/exam-1/docket").session(session))
+        .andExpect(status().isOk());
+
+    ArgumentCaptor<AiRequest> request = ArgumentCaptor.forClass(AiRequest.class);
+    verify(ai).generate(request.capture());
+    assertThat(request.getValue().languageTarget()).isEqualTo(LanguageTarget.ENGLISH);
   }
 }

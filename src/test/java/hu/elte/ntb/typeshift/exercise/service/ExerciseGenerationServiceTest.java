@@ -12,9 +12,11 @@ import hu.elte.ntb.typeshift.ai.model.AiRequest;
 import hu.elte.ntb.typeshift.ai.model.AiResponse;
 import hu.elte.ntb.typeshift.ai.model.ContentType;
 import hu.elte.ntb.typeshift.ai.model.ExamType;
+import hu.elte.ntb.typeshift.ai.model.LanguageTarget;
 import hu.elte.ntb.typeshift.ai.service.AiProviderException;
 import hu.elte.ntb.typeshift.ai.service.GeminiContentService;
 import hu.elte.ntb.typeshift.exercise.model.CannedExercise;
+import java.util.Locale;
 import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.Test;
 
@@ -91,5 +93,33 @@ class ExerciseGenerationServiceTest {
     assertThat(request.getValue().focusKeys()).isEmpty();
     assertThat(request.getValue().recentContentHashes()).isEmpty();
     assertThat(generated.expectedAnswer()).isEqualTo("A task for practice.");
+  }
+
+  @Test
+  void usesUiLocaleAsTargetLanguage() {
+    GeminiContentService ai = mock(GeminiContentService.class);
+    when(ai.generate(any(AiRequest.class))).thenReturn(new AiResponse("Practice text."));
+    ExerciseGenerationService generation = new ExerciseGenerationService(ai);
+    CannedExercise definition =
+        new CannedExercise(
+            4, ExamType.SUB_EXAM, "exam-1", "Test", ContentType.PROSE, null, "", "", 45);
+
+    ArgumentCaptor<AiRequest> request = ArgumentCaptor.forClass(AiRequest.class);
+
+    generation.generate(definition, Locale.ENGLISH);
+    verify(ai).generate(request.capture());
+    assertThat(request.getValue().languageTarget()).isEqualTo(LanguageTarget.ENGLISH);
+
+    generation.generate(definition, new Locale("hu"));
+    verify(ai, times(2)).generate(request.capture());
+    assertThat(request.getValue().languageTarget()).isEqualTo(LanguageTarget.HUNGARIAN);
+
+    generation.generate(definition, new Locale("vi"));
+    verify(ai, times(3)).generate(request.capture());
+    assertThat(request.getValue().languageTarget()).isEqualTo(LanguageTarget.VIETNAMESE);
+
+    generation.generate(definition, new Locale("fr"));
+    verify(ai, times(4)).generate(request.capture());
+    assertThat(request.getValue().languageTarget()).isEqualTo(LanguageTarget.VIETNAMESE);
   }
 }

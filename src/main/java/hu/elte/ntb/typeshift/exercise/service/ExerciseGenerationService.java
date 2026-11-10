@@ -11,6 +11,7 @@ import hu.elte.ntb.typeshift.ai.service.GeminiContentService;
 import hu.elte.ntb.typeshift.ai.service.MathExpressionEvaluator;
 import hu.elte.ntb.typeshift.exercise.model.CannedExercise;
 import java.util.List;
+import java.util.Locale;
 import java.security.SecureRandom;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,12 @@ public class ExerciseGenerationService {
   }
 
   public CannedExercise generate(CannedExercise definition) {
+    return generate(definition, new Locale("hu"));
+  }
+
+  public CannedExercise generate(CannedExercise definition, Locale locale) {
     TaskType taskType = taskType(definition);
+    LanguageTarget target = mapLocaleToLanguageTarget(locale);
     AiRequest request =
         new AiRequest(
             definition.stageId(),
@@ -36,7 +42,7 @@ public class ExerciseGenerationService {
             subExamNumber(definition),
             List.of(),
             List.of(),
-            LanguageTarget.HUNGARIAN,
+            target,
             taskType);
     AiResponse response = ai.generate(request);
     String expectedAnswer;
@@ -70,6 +76,15 @@ public class ExerciseGenerationService {
       return 0;
     }
     return Integer.parseInt(definition.examKey().substring("exam-".length()));
+  }
+
+  private static LanguageTarget mapLocaleToLanguageTarget(Locale locale) {
+    String lang = locale.getLanguage();
+    return switch (lang) {
+      case "en" -> LanguageTarget.ENGLISH;
+      case "hu" -> LanguageTarget.HUNGARIAN;
+      default -> LanguageTarget.VIETNAMESE;
+    };
   }
 
   private static String validate(CannedExercise definition, AiResponse response) {
