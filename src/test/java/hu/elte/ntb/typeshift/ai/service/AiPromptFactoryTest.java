@@ -57,7 +57,7 @@ class AiPromptFactoryTest {
   void stationAndTaskPromptsFollowSpecifications() {
     assertThat(topicPrompt(1, ExamType.SUB_EXAM, 1, null, "Home row grounding"))
         .contains("a s d f j k l é");
-    assertThat(topicPrompt(1, ExamType.SUB_EXAM, 2, null, "Top row & QWERTZ swap"))
+    assertThat(topicPrompt(1, ExamType.SUB_EXAM, 2, null, "Top row & QWERTZ keys"))
         .contains("q w e r t z u i o p ő ú");
     assertThat(topicPrompt(1, ExamType.SUB_EXAM, 3, null, "Bottom row baseline"))
         .contains("y x c v b n m")
@@ -173,6 +173,166 @@ class AiPromptFactoryTest {
         .contains("technical code annotation");
     assertThatThrownBy(() -> AiPromptFactory.create(request(5, ExamType.SUB_EXAM, 1, null)))
         .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void localizesExerciseAndTaskPrompts() {
+    // English prompts
+    String englishHomeRow = promptForLanguage(1, ExamType.SUB_EXAM, 1, null, LanguageTarget.ENGLISH);
+    assertThat(englishHomeRow)
+        .contains("English")
+        .contains("a s d f j k l ;")
+        .doesNotContain("QWERTZ")
+        .doesNotContain("`y`/`z` swap");
+    
+    String englishTopRow = promptForLanguage(1, ExamType.SUB_EXAM, 2, null, LanguageTarget.ENGLISH);
+    assertThat(englishTopRow)
+        .contains("q w e r t y u i o p [ ]")
+        .doesNotContain("`y`/`z` swap");
+    
+    String englishAccent = promptForLanguage(4, ExamType.SUB_EXAM, 1, null, LanguageTarget.ENGLISH);
+    assertThat(englishAccent)
+        .contains("English")
+        .doesNotContain("á é í ó ö ő ú ü ű");
+    
+    String englishEmail = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.EMAIL_REPLY, LanguageTarget.ENGLISH);
+    assertThat(englishEmail)
+        .contains("Subject:")
+        .doesNotContain("Tárgy:");
+
+    // Hungarian prompts
+    String hungarianHomeRow = promptForLanguage(1, ExamType.SUB_EXAM, 1, null, LanguageTarget.HUNGARIAN);
+    assertThat(hungarianHomeRow)
+        .contains("Hungarian")
+        .contains("a s d f j k l é");
+    
+    String hungarianTopRow = promptForLanguage(1, ExamType.SUB_EXAM, 2, null, LanguageTarget.HUNGARIAN);
+    assertThat(hungarianTopRow)
+        .contains("q w e r t z u i o p ő ú")
+        .contains("`y`/`z` swap");
+    
+    String hungarianAccent = promptForLanguage(4, ExamType.SUB_EXAM, 1, null, LanguageTarget.HUNGARIAN);
+    assertThat(hungarianAccent)
+        .contains("Hungarian")
+        .contains("á é í ó ö ő ú ü ű");
+    
+    String hungarianEmail = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.EMAIL_REPLY, LanguageTarget.HUNGARIAN);
+    assertThat(hungarianEmail)
+        .contains("Tárgy:")
+        .doesNotContain("Subject:");
+
+    // Vietnamese prompts
+    String vietnameseHomeRow = promptForLanguage(1, ExamType.SUB_EXAM, 1, null, LanguageTarget.VIETNAMESE);
+    assertThat(vietnameseHomeRow)
+        .contains("Vietnamese")
+        .contains("a s d f j k l ;")
+        .doesNotContain("QWERTZ")
+        .doesNotContain("`y`/`z` swap");
+    
+    String vietnameseAccent = promptForLanguage(4, ExamType.SUB_EXAM, 1, null, LanguageTarget.VIETNAMESE);
+    assertThat(vietnameseAccent)
+        .contains("Vietnamese")
+        .contains("ă â đ ê ô ơ ư");
+    
+    String vietnameseEmail = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.EMAIL_REPLY, LanguageTarget.VIETNAMESE);
+    assertThat(vietnameseEmail)
+        .contains("Chủ đề:")
+        .doesNotContain("Subject:")
+        .doesNotContain("Tárgy:");
+  }
+
+  @Test
+  void allPromptsHaveNoUnresolvedPlaceholders() {
+    LanguageTarget[] targets = {LanguageTarget.ENGLISH, LanguageTarget.HUNGARIAN, LanguageTarget.VIETNAMESE};
+    int[] subExamCounts = {3, 2, 2, 2, 4};
+    
+    for (LanguageTarget target : targets) {
+      for (int stage = 1; stage <= subExamCounts.length; stage++) {
+        for (int subExam = 1; subExam <= subExamCounts[stage - 1]; subExam++) {
+          TaskType taskType = (stage == 5) ? TaskType.CHAT_BURST : null;
+          String prompt = promptForLanguage(stage, ExamType.SUB_EXAM, subExam, taskType, target);
+          assertThat(prompt)
+              .as("stage %s exam-%s %s prompt", stage, subExam, target)
+              .doesNotContain("{language}")
+              .doesNotContain("{keyboardLayout}")
+              .doesNotContain("{layoutRule}")
+              .doesNotContain("{homeRowKeys}")
+              .doesNotContain("{topRowKeys}")
+              .doesNotContain("{bottomRowKeys}")
+              .doesNotContain("{diacriticRule}")
+              .doesNotContain("{emailSubjectLabel}");
+        }
+        TaskType gradTaskType = (stage == 5) ? TaskType.EMAIL_REPLY : null;
+        String gradPrompt = promptForLanguage(stage, ExamType.GRADUATION, 0, gradTaskType, target);
+        assertThat(gradPrompt)
+            .as("stage %s graduation %s prompt", stage, target)
+            .doesNotContain("{language}")
+            .doesNotContain("{keyboardLayout}")
+            .doesNotContain("{layoutRule}")
+            .doesNotContain("{homeRowKeys}")
+            .doesNotContain("{topRowKeys}")
+            .doesNotContain("{bottomRowKeys}")
+            .doesNotContain("{diacriticRule}")
+            .doesNotContain("{emailSubjectLabel}");
+      }
+      
+      // Test all stage 5 task prompts
+      String chatPrompt = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.CHAT_BURST, target);
+      assertThat(chatPrompt)
+          .as("stage 5 CHAT_BURST %s prompt", target)
+          .doesNotContainPattern("\\{[a-zA-Z]+\\}");
+      
+      String emailPrompt = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.EMAIL_REPLY, target);
+      assertThat(emailPrompt)
+          .as("stage 5 EMAIL_REPLY %s prompt", target)
+          .doesNotContainPattern("\\{[a-zA-Z]+\\}");
+      
+      String docPrompt = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.DOCUMENT_PARAGRAPH, target);
+      assertThat(docPrompt)
+          .as("stage 5 DOCUMENT_PARAGRAPH %s prompt", target)
+          .doesNotContainPattern("\\{[a-zA-Z]+\\}");
+      
+      String codePrompt = promptForLanguage(5, ExamType.SUB_EXAM, 1, TaskType.CODE_COMMENT, target);
+      assertThat(codePrompt)
+          .as("stage 5 CODE_COMMENT %s prompt", target)
+          .doesNotContainPattern("\\{[a-zA-Z]+\\}");
+    }
+  }
+
+  @Test
+  void mathPromptsRetainDecimalCommasForAllLocales() {
+    LanguageTarget[] targets = {LanguageTarget.ENGLISH, LanguageTarget.HUNGARIAN, LanguageTarget.VIETNAMESE};
+    
+    for (LanguageTarget target : targets) {
+      String mathPrompt1 = promptForLanguage(3, ExamType.SUB_EXAM, 1, null, target);
+      assertThat(mathPrompt1)
+          .as("stage 3 exam-1 %s math prompt", target)
+          .contains("digits, commas, spaces")
+          .contains(" = ?");
+      
+      String mathPrompt2 = promptForLanguage(3, ExamType.SUB_EXAM, 2, null, target);
+      assertThat(mathPrompt2)
+          .as("stage 3 exam-2 %s math prompt", target)
+          .contains(" = ?");
+      
+      String mathGrad = promptForLanguage(3, ExamType.GRADUATION, 0, null, target);
+      assertThat(mathGrad)
+          .as("stage 3 graduation %s math prompt", target)
+          .contains(" = ?");
+    }
+  }
+
+  private String promptForLanguage(
+      int stage, ExamType examType, int subExamNumber, TaskType taskType, LanguageTarget target) {
+    AiRequest req = new AiRequest(
+        stage,
+        examType,
+        subExamNumber,
+        List.of(),
+        List.of(),
+        target,
+        taskType);
+    return AiPromptFactory.create(req);
   }
 
   private String prompt(int stage, ExamType examType, int subExamNumber, TaskType taskType) {

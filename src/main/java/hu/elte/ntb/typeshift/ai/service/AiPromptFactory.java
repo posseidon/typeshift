@@ -20,7 +20,41 @@ public final class AiPromptFactory {
     Objects.requireNonNull(request, "request");
     String exerciseFormat = readPrompt(exercisePrompt(request));
     String formattedExercise = applyStageFormat(exerciseFormat, request);
-    return createGenerationPrompt(formattedExercise, request);
+    String localizedExercise = applyLocaleSubstitutions(formattedExercise, request);
+    return createGenerationPrompt(localizedExercise, request);
+  }
+
+  private static String applyLocaleSubstitutions(String prompt, AiRequest request) {
+    return switch (request.languageTarget()) {
+      case ENGLISH -> prompt
+          .replace("{language}", "English")
+          .replace("{keyboardLayout}", "QWERTY")
+          .replace("{layoutRule}", "")
+          .replace("{homeRowKeys}", "a s d f j k l ;")
+          .replace("{topRowKeys}", "q w e r t y u i o p [ ]")
+          .replace("{bottomRowKeys}", "z x c v b n m")
+          .replace("{diacriticRule}", "Use natural English without required diacritics")
+          .replace("{emailSubjectLabel}", "Subject:");
+      case HUNGARIAN -> prompt
+          .replace("{language}", "Hungarian")
+          .replace("{keyboardLayout}", "QWERTZ")
+          .replace("{layoutRule}", " after noticing the QWERTY/QWERTZ `y`/`z` swap")
+          .replace("{homeRowKeys}", "a s d f j k l é")
+          .replace("{topRowKeys}", "q w e r t z u i o p ő ú")
+          .replace("{bottomRowKeys}", "y x c v b n m")
+          .replace("{diacriticRule}", "á é í ó ö ő ú ü ű")
+          .replace("{emailSubjectLabel}", "Tárgy:");
+      case VIETNAMESE -> prompt
+          .replace("{language}", "Vietnamese")
+          .replace("{keyboardLayout}", "QWERTY")
+          .replace("{layoutRule}", "")
+          .replace("{homeRowKeys}", "a s d f j k l ;")
+          .replace("{topRowKeys}", "q w e r t y u i o p [ ]")
+          .replace("{bottomRowKeys}", "z x c v b n m")
+          .replace("{diacriticRule}", "ă â đ ê ô ơ ư with natural Vietnamese tone marks")
+          .replace("{emailSubjectLabel}", "Chủ đề:");
+      case MIXED -> prompt; // No substitutions for MIXED
+    };
   }
 
   private static String applyStageFormat(String exerciseFormat, AiRequest request) {
