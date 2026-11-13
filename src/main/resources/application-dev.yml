@@ -1,6 +1,6 @@
 spring:
   config:
-    import: "optional:file:../.env[.properties]"
+    import: "optional:file:./.env[.properties]"
 
   # DevTools automatically sets this to false, but explicit is better
   thymeleaf:
