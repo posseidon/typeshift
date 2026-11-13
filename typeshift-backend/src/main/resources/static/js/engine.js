@@ -102,6 +102,7 @@
         retryCount.textContent = pad(errorCount);
         grossCount.textContent = String(typedText.length);
         updateSubmission(typedText, typedText.length === targetText.length);
+        display.querySelector('.cursor-block')?.scrollIntoView({ block: 'nearest', behavior: 'auto' });
       }
 
       input.addEventListener('input', function (e) {
@@ -111,7 +112,7 @@
       });
 
       container.addEventListener('click', function () {
-        input.focus();
+        input.focus({ preventScroll: true });
       });
 
       renderText();

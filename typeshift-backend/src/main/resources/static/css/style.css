@@ -885,7 +885,7 @@ form.stack { display: flex; flex-direction: column; gap: var(--space-md); max-wi
 @keyframes cursor-blink { 50% { opacity: 0; } }
 
 #practice-input {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 4px;

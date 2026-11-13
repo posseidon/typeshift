@@ -588,7 +588,7 @@ a:focus-visible {
 @keyframes cursor-blink { 50% { opacity: 0; } }
 
 #practice-input {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 4px;
